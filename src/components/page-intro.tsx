@@ -46,9 +46,10 @@ export function PageIntro({
             src={image.src}
             alt={image.alt}
             sizes="100vw"
-            loading="eager"
+            preload
+            fetchPriority="high"
             placeholder="blur"
-            className="settle absolute inset-0 -z-20 h-full w-full object-cover"
+            className="absolute inset-0 -z-20 h-full w-full object-cover"
             style={{ objectPosition: imagePosition }}
           />
           <div

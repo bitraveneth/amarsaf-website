@@ -40,7 +40,7 @@ export function BackToTop() {
       tabIndex={visible ? 0 : -1}
       aria-hidden={!visible}
       className={cn(
-        "group fixed right-4 bottom-4 z-40 flex size-14 items-center justify-center rounded-full bg-night text-white shadow-[0_18px_40px_-16px_rgb(23_10_53/0.8)] ring-1 ring-white/10 transition-[opacity,translate] duration-300 hover:bg-purple sm:right-6 sm:bottom-6 motion-reduce:transition-none",
+        "group fixed right-4 bottom-[5.25rem] z-40 flex size-14 items-center justify-center rounded-full bg-night text-white shadow-[0_18px_40px_-16px_rgb(23_10_53/0.8)] ring-1 ring-white/10 transition-[opacity,translate] duration-300 hover:bg-purple sm:right-6 sm:bottom-[5.75rem] motion-reduce:transition-none",
         visible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-4 opacity-0",
       )}
     >

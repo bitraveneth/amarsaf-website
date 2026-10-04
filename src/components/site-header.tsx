@@ -131,8 +131,8 @@ export function SiteHeader() {
               <Image
                 src="/brand/saf-horizontal-tight-white.svg"
                 alt="SAF home"
-                width={1106}
-                height={303}
+                width={128}
+                height={35}
                 unoptimized
                 className="h-7 w-auto sm:h-8"
               />

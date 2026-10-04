@@ -1,6 +1,5 @@
 import {
   ArrowRight,
-  ArrowUpRight,
   BadgeCheck,
   Building2,
   Check,
@@ -10,6 +9,7 @@ import {
   House,
   Layers,
   Leaf,
+  Phone,
   Recycle,
   ShieldCheck,
   Store,
@@ -20,9 +20,23 @@ import Image from "next/image";
 import Link from "next/link";
 import { HeroSlider } from "@/components/hero-slider";
 import { ProductCard } from "@/components/product-card";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { heroSlides } from "@/lib/hero-slides";
 import { images, productLifestyle } from "@/lib/images";
-import { certifications, milestones, minerals, products, stages } from "@/lib/site";
+import {
+  certifications,
+  company,
+  faqs,
+  minerals,
+  products,
+  stages,
+  stories,
+} from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
@@ -101,8 +115,40 @@ const heroStats = [
   },
 ];
 
+const stageBarTone = [
+  "bg-white/30",
+  "bg-white/30",
+  "bg-white/30",
+  "bg-white/55",
+  "bg-[#c9b5ff]",
+  "bg-white",
+  "bg-white",
+  "bg-white",
+] as const;
+
+const certificationScope: Record<(typeof certifications)[number], string> = {
+  "BSTI BDS 1240:2001": "Bangladesh standard",
+  "ISO 22000": "Food-safety management",
+  HACCP: "Risk control at each step",
+  Halal: "Production and materials",
+};
+
+const latestStories = [...stories].sort((a, b) => b.iso.localeCompare(a.iso)).slice(0, 3);
+
+const homeFaqQuestions: (typeof faqs)[number]["q"][] = [
+  "How do I start a home or office supply?",
+  "Where do you deliver?",
+  "How do the returnable 18 L jars work?",
+  "Which certifications cover the water?",
+  "What does 8-stage purification mean?",
+];
+const homeFaqs = homeFaqQuestions.flatMap((q) => faqs.filter((item) => item.q === q));
+
 const primaryCta =
   "inline-flex h-12 items-center justify-center gap-2 rounded-full px-6 text-[0.9375rem] font-semibold transition-colors";
+
+const outlinePill =
+  "group inline-flex h-11 items-center gap-2 rounded-full border border-ink/15 px-5 text-sm font-semibold text-ink transition-colors hover:border-purple hover:text-purple";
 
 function CardHead({
   icon: Icon,
@@ -130,6 +176,25 @@ function CardHead({
   );
 }
 
+function CardFigure({
+  value,
+  unit,
+  className,
+}: {
+  value: number;
+  unit: string;
+  className?: string;
+}) {
+  return (
+    <p className="flex shrink-0 items-baseline gap-2 leading-none">
+      <span className="text-[3.75rem] font-extrabold tracking-[-0.06em] tabular-nums sm:text-[4.5rem]">
+        {value}
+      </span>
+      <span className={cn("text-sm font-semibold", className)}>{unit}</span>
+    </p>
+  );
+}
+
 const cardTitle = "mt-10 text-[1.625rem] leading-tight sm:text-[1.875rem]";
 
 export default function Home() {
@@ -152,10 +217,7 @@ export default function Home() {
                 Every bottle, by the numbers.
               </h2>
             </div>
-            <Link
-              href="/about"
-              className="group inline-flex h-11 items-center gap-2 rounded-full border border-ink/15 px-5 text-sm font-semibold text-ink transition-colors hover:border-purple hover:text-purple"
-            >
+            <Link href="/about" className={outlinePill}>
               How we purify
               <ArrowRight
                 aria-hidden
@@ -219,6 +281,7 @@ export default function Home() {
               <Image
                 src={images.bottlingLine.src}
                 alt=""
+                placeholder="blur"
                 sizes="(min-width: 1024px) 55vw, 100vw"
                 className="absolute inset-0 -z-20 h-full w-full object-cover opacity-25 transition-transform duration-[1200ms] ease-out group-hover:scale-105 motion-reduce:transition-none"
               />
@@ -227,27 +290,43 @@ export default function Home() {
                 className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_100%_0%,rgb(109_43_213/0.6),transparent_55%)] bg-gradient-to-t from-night via-night/85 to-night/55"
               />
               <CardHead icon={FlaskConical} index="01" className="bg-white text-purple" />
-              <h3 className={cardTitle}>Pure by science</h3>
-              <p className="mt-3 max-w-md text-white/75">
-                Deep-aquifer water runs through eight purification stages, then is
-                bottled with the minerals kept.
-              </p>
-              <ol aria-label="Purification stages" className="mt-8 flex flex-wrap gap-2">
-                {stages.map((stage, index) => (
-                  <li
-                    key={stage}
-                    className="inline-flex items-center gap-2 rounded-full bg-white/[0.08] py-1.5 pr-3.5 pl-1.5 text-xs font-semibold text-white/90 ring-1 ring-white/15 backdrop-blur-sm"
-                  >
+              <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-6">
+                <div className="min-w-0 flex-1 basis-64">
+                  <h3 className={cardTitle}>Pure by science</h3>
+                  <p className="mt-3 max-w-md text-white/75">
+                    Deep-aquifer water runs through eight purification stages, then is
+                    bottled with the minerals kept.
+                  </p>
+                </div>
+                <CardFigure value={stages.length} unit="stages" className="text-[#c9b5ff]" />
+              </div>
+              <div className="mt-auto pt-10">
+                <div aria-hidden className="flex gap-1">
+                  {stages.map((stage, index) => (
                     <span
-                      aria-hidden
-                      className="flex size-5 items-center justify-center rounded-full bg-white text-[0.625rem] font-bold text-purple"
-                    >
-                      {index + 1}
-                    </span>
-                    {stage}
-                  </li>
-                ))}
-              </ol>
+                      key={stage}
+                      style={{ transitionDelay: `${index * 70}ms` }}
+                      className={cn(
+                        "h-1.5 flex-1 rounded-full transition-[background-color,box-shadow] duration-500 group-hover:bg-white group-hover:shadow-[0_0_12px_rgb(201_181_255/0.9)] motion-reduce:transition-none",
+                        stageBarTone[index],
+                      )}
+                    />
+                  ))}
+                </div>
+                <ol
+                  aria-label="Purification stages"
+                  className="mt-4 grid grid-cols-4 gap-x-2 gap-y-4 xl:grid-cols-8"
+                >
+                  {stages.map((stage, index) => (
+                    <li key={stage} className="min-w-0">
+                      <p className="text-xs font-bold tracking-[0.14em] text-[#c9b5ff] uppercase">
+                        {String(index + 1).padStart(2, "0")}
+                      </p>
+                      <p className="mt-1 text-xs leading-snug font-semibold text-white/85">{stage}</p>
+                    </li>
+                  ))}
+                </ol>
+              </div>
             </article>
           </li>
 
@@ -276,21 +355,39 @@ export default function Home() {
           </li>
 
           <li className="reveal lg:col-span-5">
-            <article className="group flex h-full flex-col rounded-[2rem] bg-white p-7 text-ink ring-1 ring-ink/10 sm:p-9">
+            <article className="group relative isolate flex h-full flex-col overflow-hidden rounded-[2rem] bg-white p-7 text-ink ring-1 ring-ink/10 sm:p-9">
+              <div
+                aria-hidden
+                className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_100%_0%,var(--color-lavender),transparent_60%)]"
+              />
+              <ShieldCheck
+                aria-hidden
+                className="absolute -right-10 -bottom-12 -z-10 size-64 text-purple/[0.08] transition-transform duration-[1200ms] ease-out group-hover:rotate-12 motion-reduce:transition-none"
+              />
               <CardHead icon={ShieldCheck} index="03" className="bg-lavender text-purple" />
-              <h3 className={cardTitle}>Certified safety</h3>
-              <p className="mt-3 text-ink/70">
-                Four standards cover the water, and it is tested right through
-                bottling.
-              </p>
-              <ul aria-label="Certifications" className="mt-8 grid gap-2 min-[380px]:grid-cols-2">
+              <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-6">
+                <div className="min-w-0 flex-1 basis-56">
+                  <h3 className={cardTitle}>Certified safety</h3>
+                  <p className="mt-3 text-ink/70">
+                    Four standards cover the water, and it is tested right through
+                    bottling.
+                  </p>
+                </div>
+                <CardFigure value={certifications.length} unit="standards" className="text-purple" />
+              </div>
+              <ul aria-label="Certifications" className="mt-auto grid gap-2 pt-10 sm:grid-cols-2">
                 {certifications.map((item) => (
                   <li
                     key={item}
-                    className="flex items-center gap-2.5 rounded-2xl bg-haze px-3.5 py-3 text-sm leading-snug font-semibold text-ink"
+                    className="flex items-start gap-3 rounded-2xl bg-haze px-4 py-3.5 ring-1 ring-ink/[0.04] transition-colors duration-300 group-hover:bg-lavender/70 motion-reduce:transition-none sm:p-4"
                   >
-                    <BadgeCheck aria-hidden className="size-4 shrink-0 text-purple" />
-                    {item}
+                    <BadgeCheck aria-hidden className="mt-px size-5 shrink-0 text-purple" />
+                    <span className="min-w-0">
+                      <span className="block text-sm leading-snug font-bold">{item}</span>
+                      <span className="mt-1 block text-xs leading-snug text-ink/60">
+                        {certificationScope[item]}
+                      </span>
+                    </span>
                   </li>
                 ))}
               </ul>
@@ -309,7 +406,7 @@ export default function Home() {
                 Recyclable bottles, and 18 L jars that come back to be washed and
                 refilled. Process water is recovered inside the plant.
               </p>
-              <ul aria-label="Packaging" className="mt-8 flex flex-wrap gap-2">
+              <ul aria-label="Packaging" className="mt-auto flex flex-wrap gap-2 pt-8">
                 {["BPA-free rPET bottles", "Returnable 18 L jars", "Water recovered in the plant"].map(
                   (item) => (
                     <li
@@ -525,117 +622,132 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="on-dark relative isolate overflow-hidden bg-night text-white">
-        <Image
-          src={images.heritage.src}
-          alt={images.heritage.alt}
-          placeholder="blur"
-          sizes="100vw"
-          className="absolute inset-0 -z-20 h-full w-full object-cover object-[65%_center]"
-        />
-        <div
-          aria-hidden
-          className="absolute inset-0 -z-10 bg-gradient-to-t from-night via-night/60 to-night/0"
-        />
-        <div className="shell flex min-h-[36rem] flex-col justify-end py-14 md:min-h-[42rem] md:py-20">
-          <p className="eyebrow text-[#d6c8ff]">The SAF story</p>
-          <h2 className="text-headline mt-4 max-w-[15ch]">
-            From one idea to a certified Dhaka plant.
-          </h2>
-          <ol className="mt-10 grid gap-3 sm:grid-cols-3 lg:max-w-4xl" aria-label="Recent milestones">
-            {milestones
-              .filter((milestone) => milestone.status === "done" && milestone.iso)
-              .map((milestone) => (
-                <li
-                  key={milestone.title}
-                  className="rounded-2xl border border-white/15 bg-night/45 p-5 backdrop-blur-md"
-                >
-                  <time dateTime={milestone.iso} className="text-xs font-semibold text-[#d6c8ff]">
-                    {milestone.when}
-                  </time>
-                  <p className="mt-2 font-semibold">{milestone.title}</p>
-                </li>
-              ))}
-          </ol>
-          <Link
-            href="/heritage"
-            className={cn(primaryCta, "mt-10 w-fit bg-white text-purple hover:bg-lavender")}
-          >
-            Read our story
-            <ArrowRight aria-hidden className="size-4" />
-          </Link>
+      <section aria-labelledby="news-title" className="bg-haze py-20 md:py-28">
+        <div className="shell">
+          <div className="flex flex-wrap items-end justify-between gap-x-10 gap-y-6">
+            <div>
+              <p className="eyebrow text-purple">News</p>
+              <h2 id="news-title" className="text-headline mt-4 text-ink">
+                Latest from SAF.
+              </h2>
+              <p className="text-lede mt-5 max-w-md text-ink/70">
+                Notes from the plant and the route.
+              </p>
+            </div>
+            <Link href="/news" className={outlinePill}>
+              See all news
+              <ArrowRight
+                aria-hidden
+                className="size-4 transition-transform group-hover:translate-x-0.5"
+              />
+            </Link>
+          </div>
+
+          <ul className="mt-12 grid gap-3 md:grid-cols-3 md:gap-5 lg:mt-16">
+            {latestStories.map((story) => (
+              <li key={story.iso} className="reveal">
+                <article className="group relative grid h-full grid-cols-[6.5rem_minmax(0,1fr)] items-center gap-4 rounded-[1.75rem] bg-white p-3 ring-1 ring-ink/[0.06] transition-[translate,box-shadow] duration-500 ease-out hover:-translate-y-1 hover:shadow-[0_40px_80px_-45px_rgb(23_10_53/0.5)] motion-reduce:transition-none md:flex md:flex-col md:items-stretch md:gap-0">
+                  <div className="overflow-hidden rounded-[1.25rem]">
+                    <Image
+                      src={images[story.image].src}
+                      alt={images[story.image].alt}
+                      placeholder="blur"
+                      sizes="(min-width: 1024px) 28vw, (min-width: 768px) 31vw, 7rem"
+                      className="aspect-square h-auto w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 motion-reduce:transition-none md:aspect-[4/3]"
+                    />
+                  </div>
+                  <div className="flex flex-1 flex-col py-1 pr-2 md:px-4 md:pt-6 md:pb-4">
+                    <time dateTime={story.iso} className="text-xs font-semibold text-purple md:text-sm">
+                      {story.date}
+                    </time>
+                    <h3 className="mt-1.5 text-base leading-snug text-ink md:mt-3 md:text-[1.375rem] md:leading-tight">
+                      <Link
+                        href="/news"
+                        className="rounded-sm after:absolute after:inset-0 after:rounded-[1.75rem] focus-visible:outline-offset-4"
+                      >
+                        {story.title}
+                      </Link>
+                    </h3>
+                    <p className="mt-3 hidden text-sm leading-relaxed text-ink/65 md:block">
+                      {story.body}
+                    </p>
+                    <span
+                      aria-hidden
+                      className="mt-auto hidden items-center gap-2 pt-6 text-sm font-semibold text-purple md:inline-flex"
+                    >
+                      Read the story
+                      <ArrowRight className="size-4 transition-transform group-hover:translate-x-1 motion-reduce:transition-none" />
+                    </span>
+                  </div>
+                </article>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
-      <section className="shell py-16 md:py-24">
-        <div className="on-dark relative isolate overflow-hidden rounded-[2rem] bg-purple text-white sm:rounded-[2.5rem]">
-          <div
-            aria-hidden
-            className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_12%_0%,rgb(255_255_255/0.16),transparent_42%),radial-gradient(circle_at_0%_100%,#2a0e5c,transparent_60%)]"
-          />
-          <div className="grid lg:grid-cols-12">
-            <div className="p-7 sm:p-12 lg:col-span-7 lg:p-16">
-              <p className="eyebrow text-white/80">Case packs</p>
-              <h2 className="text-headline mt-4 max-w-[12ch]">Buy SAF by the case.</h2>
-              <p className="text-lede mt-5 max-w-lg text-white/85">
-                Retailers, offices, and households take SAF in case packs — the
-                same purified water in every size.
-              </p>
-              <ul className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-4" aria-label="Case packs">
-                {products.map((product) => (
-                  <li key={product.id}>
-                    <Link
-                      href={`/products/${product.id}`}
-                      className="group block h-full rounded-2xl bg-white/10 p-4 ring-1 ring-white/15 transition-colors hover:bg-white hover:text-purple"
-                    >
-                      <span className="block text-2xl font-extrabold tracking-[-0.03em]">
-                        {product.size}
-                      </span>
-                      <span className="mt-1 block text-sm text-white/80 group-hover:text-ink/70">
-                        {product.pack}
-                      </span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center">
+      <section
+        aria-labelledby="faq-title"
+        className="shell grid gap-10 py-20 md:py-28 lg:grid-cols-12 lg:gap-x-16 lg:gap-y-10"
+      >
+        <div className="lg:col-span-5">
+          <p className="eyebrow text-purple">FAQ</p>
+          <h2 id="faq-title" className="text-headline mt-4 max-w-[11ch] text-ink">
+            Questions, answered.
+          </h2>
+          <p className="text-lede mt-5 max-w-md text-ink/70">
+            Straight answers before you order: starting a supply, where we
+            deliver, how the jars come back, and what keeps the water safe.
+          </p>
+        </div>
+
+        <Accordion
+          defaultValue={[homeFaqs[0].q]}
+          className="border-t-2 border-ink lg:col-span-7 lg:row-span-2"
+        >
+          {homeFaqs.map((item, index) => (
+            <AccordionItem key={item.q} value={item.q} className="border-b border-ink/15">
+              <AccordionTrigger className="items-center gap-4 rounded-none py-5 text-[1.0625rem] font-semibold text-ink hover:no-underline hover:text-purple md:gap-6 md:py-6 md:text-xl [&_[data-slot=accordion-trigger-icon]]:size-5 [&_[data-slot=accordion-trigger-icon]]:text-purple">
+                <span className="w-7 shrink-0 text-sm font-semibold text-purple tabular-nums">
+                  0{index + 1}
+                </span>
+                <span className="flex-1 tracking-[-0.015em]">{item.q}</span>
+              </AccordionTrigger>
+              <AccordionContent className="pb-6 pl-11 text-base leading-relaxed text-ink/75 md:pb-7 md:pl-[3.25rem] md:text-[1.0625rem]">
+                {item.a}
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+
+        <div className="grid content-start gap-6 lg:col-span-5">
+          <Link href="/faq" className={cn(outlinePill, "w-fit")}>
+            All questions
+            <ArrowRight
+              aria-hidden
+              className="size-4 transition-transform group-hover:translate-x-0.5"
+            />
+          </Link>
+          <div className="flex max-w-md items-start gap-4 rounded-[1.75rem] bg-haze p-5 ring-1 ring-ink/[0.05] sm:p-6">
+            <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-white text-purple shadow-sm">
+              <Phone aria-hidden className="size-5" />
+            </span>
+            <div className="min-w-0">
+              <p className="font-semibold text-ink">Still deciding?</p>
+              <p className="mt-1 text-sm leading-relaxed text-ink/65">
+                Call the hotline on{" "}
+                <span className="font-semibold whitespace-nowrap text-ink tabular-nums">
+                  {company.hotline}
+                </span>
+                , or{" "}
                 <Link
                   href="/contact"
-                  className={cn(primaryCta, "bg-white text-purple hover:bg-lavender")}
+                  className="rounded-sm font-semibold text-purple underline underline-offset-4 hover:text-purple-deep"
                 >
-                  Request case pricing
-                  <ArrowUpRight aria-hidden className="size-4" />
+                  send us a message
                 </Link>
-                <Link
-                  href="/products"
-                  className={cn(
-                    primaryCta,
-                    "border border-white/40 text-white hover:border-white hover:bg-white/10",
-                  )}
-                >
-                  See all products
-                </Link>
-              </div>
-              <p className="mt-8 flex items-center gap-2.5 text-sm text-white/85">
-                <span aria-hidden className="relative flex size-2.5">
-                  <span className="absolute inset-0 animate-ping rounded-full bg-fresh/70 motion-reduce:animate-none" />
-                  <span className="relative size-2.5 rounded-full bg-fresh" />
-                </span>
-                Online ordering for case packs is on the way.
+                .
               </p>
-            </div>
-            <div className="relative min-h-72 sm:min-h-96 lg:col-span-5 lg:min-h-full">
-              <Image
-                src={images.lineup.src}
-                alt={images.lineup.alt}
-                placeholder="blur"
-                sizes="(min-width: 1024px) 36vw, 100vw"
-                className="absolute inset-0 h-full w-full object-cover object-[70%_center]"
-              />
-              <div
-                aria-hidden
-                className="absolute inset-0 bg-gradient-to-b from-purple via-purple/10 to-transparent lg:bg-gradient-to-r lg:via-transparent"
-              />
             </div>
           </div>
         </div>

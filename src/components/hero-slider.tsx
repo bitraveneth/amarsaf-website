@@ -4,6 +4,7 @@ import { ArrowUpRight, ChevronLeft, ChevronRight, Pause, Play } from "lucide-rea
 import Image from "next/image";
 import Link from "next/link";
 import {
+  useEffect,
   useRef,
   useState,
   useSyncExternalStore,
@@ -44,6 +45,13 @@ export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
   const paused = userPaused ?? reducedMotion;
   const running = !paused && !hovered;
   const slide = slides[index];
+  // Other slides sit in the viewport at opacity 0, so the browser would fetch them
+  // with the LCP image. Keep them out until the first paint has finished.
+  const [warm, setWarm] = useState(false);
+  useEffect(() => {
+    const id = window.setTimeout(() => setWarm(true), 2500);
+    return () => window.clearTimeout(id);
+  }, []);
 
   function go(next: number, manual = true) {
     setIndex((next + count) % count);
@@ -92,29 +100,35 @@ export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
     >
       <h1 className="sr-only">SAF packaged drinking water — Simply Pure</h1>
 
-      {slides.map((item, i) => (
-        <div
-          key={item.id}
-          aria-hidden={i !== index}
-          className={cn(
-            "absolute inset-0 -z-20 transition-opacity duration-[1200ms] ease-out motion-reduce:transition-none",
-            i === index ? "opacity-100" : "opacity-0",
-          )}
-        >
-          <Image
-            src={item.image}
-            alt={item.alt}
-            sizes="100vw"
-            preload={i === 0}
-            placeholder="blur"
+      {slides.map((item, i) => {
+        const active = i === index;
+        if (!active && !(warm && i === (index + 1) % count)) return null;
+        return (
+          <div
+            key={item.id}
+            aria-hidden={!active}
             className={cn(
-              "h-full w-full object-cover transition-transform duration-[9000ms] ease-out motion-reduce:transition-none",
-              i === index ? "scale-100" : "scale-[1.12]",
+              "absolute inset-0 -z-20 transition-opacity duration-[1200ms] ease-out motion-reduce:transition-none",
+              active ? "opacity-100" : "opacity-0",
             )}
-            style={{ objectPosition: item.focus ?? "center" }}
-          />
-        </div>
-      ))}
+          >
+            <Image
+              src={item.image}
+              alt={item.alt}
+              sizes="100vw"
+              preload={active}
+              fetchPriority={active ? "high" : "low"}
+              quality={65}
+              placeholder="blur"
+              className={cn(
+                "h-full w-full object-cover transition-transform duration-[9000ms] ease-out motion-reduce:transition-none",
+                active ? "scale-100" : "scale-[1.12]",
+              )}
+              style={{ objectPosition: item.focus ?? "center" }}
+            />
+          </div>
+        );
+      })}
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-gradient-to-t from-night via-night/60 to-night/10 lg:bg-gradient-to-r lg:from-night/90 lg:via-night/40 lg:to-transparent"

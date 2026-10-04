@@ -51,6 +51,7 @@ export default async function ProductPage({ params }: PageProps<"/products/[slug
                 alt={image.alt}
                 placeholder="blur"
                 preload
+                fetchPriority="high"
                 sizes="(min-width: 1024px) 40vw, 448px"
                 className="aspect-square h-auto w-full object-cover"
               />

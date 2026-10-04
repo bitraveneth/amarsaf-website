@@ -1,68 +1,16 @@
-import {
-  ArrowRight,
-  Droplets,
-  Recycle,
-  RefreshCcw,
-  RotateCcw,
-  Sparkles,
-  SunDim,
-  Truck,
-  Waves,
-} from "lucide-react";
+import { ArrowRight, RotateCcw } from "lucide-react";
 import type { Metadata } from "next";
 import { AboutExplore } from "@/components/about-explore";
 import { AboutNav } from "@/components/about-nav";
 import { PageIntro } from "@/components/page-intro";
 import { images } from "@/lib/images";
+import { careTips, commitments, jarLoop } from "@/lib/sustainability";
 
 export const metadata: Metadata = {
   title: "Sustainability",
   description:
     "Recyclable BPA-free rPET bottles, returnable 18 L jars, and process water recovered inside the SAF plant in Bashundhara.",
 };
-
-const commitments = [
-  {
-    icon: Recycle,
-    title: "Recyclable bottles",
-    body: "Bottles are BPA-free rPET, made to go back into recycling once they are empty.",
-  },
-  {
-    icon: RefreshCcw,
-    title: "Returnable jars",
-    body: "18 L jars come back on the delivery route to be washed, refilled, and sealed again.",
-  },
-  {
-    icon: Waves,
-    title: "Water recovered",
-    body: "Process water is recovered inside the plant instead of going straight to drain.",
-  },
-];
-
-const loop = [
-  { icon: Truck, title: "Delivered", body: "A sealed 18 L jar reaches your dispenser." },
-  { icon: RotateCcw, title: "Returned", body: "The empty jar goes back on the next delivery." },
-  { icon: Sparkles, title: "Washed", body: "Every jar is cleaned and checked at the plant." },
-  { icon: Droplets, title: "Refilled", body: "Filled, capped with a tamper-proof seal, and sent out again." },
-];
-
-const tips = [
-  {
-    icon: RotateCcw,
-    title: "Hand back empty jars",
-    body: "Keep the empty jar ready for the next delivery so it can go round again.",
-  },
-  {
-    icon: Recycle,
-    title: "Recycle the bottle",
-    body: "Empty it, put the cap back on, and drop it in recycling.",
-  },
-  {
-    icon: SunDim,
-    title: "Store out of the sun",
-    body: "Keep jars and bottles in a cool, shaded place before and after opening.",
-  },
-];
 
 export default function SustainabilityPage() {
   return (
@@ -124,7 +72,7 @@ export default function SustainabilityPage() {
             Every SAF Commercial jar is built to make the trip many times.
           </p>
           <ol className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {loop.map(({ icon: Icon, title, body }, index) => (
+            {jarLoop.map(({ icon: Icon, title, body }, index) => (
               <li
                 key={title}
                 className="reveal relative rounded-[1.75rem] bg-white/[0.06] p-6 ring-1 ring-white/12 backdrop-blur-sm sm:p-7"
@@ -139,7 +87,7 @@ export default function SustainabilityPage() {
                 </div>
                 <h3 className="mt-8 text-xl">{title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-white/70">{body}</p>
-                {index < loop.length - 1 ? (
+                {index < jarLoop.length - 1 ? (
                   <ArrowRight
                     aria-hidden
                     className="absolute top-1/2 -right-3.5 hidden size-7 -translate-y-1/2 rounded-full bg-[#22b573] p-1.5 text-white lg:block"
@@ -165,7 +113,7 @@ export default function SustainabilityPage() {
             </h2>
           </div>
           <ul className="grid gap-4 sm:grid-cols-3 lg:col-span-8">
-            {tips.map(({ icon: Icon, title, body }) => (
+            {careTips.map(({ icon: Icon, title, body }) => (
               <li key={title} className="reveal rounded-[1.75rem] bg-haze p-6 ring-1 ring-ink/[0.05] sm:p-7">
                 <span className="flex size-12 items-center justify-center rounded-2xl bg-white text-[#137a4b] shadow-[0_8px_20px_-10px_rgb(23_10_53/0.3)]">
                   <Icon aria-hidden className="size-5" />

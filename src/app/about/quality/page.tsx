@@ -1,23 +1,11 @@
-import {
-  Atom,
-  BadgeCheck,
-  Factory,
-  Filter,
-  FlaskConical,
-  Layers,
-  Microscope,
-  ShieldCheck,
-  Sparkles,
-  Sun,
-  Wind,
-  type LucideIcon,
-} from "lucide-react";
+import { BadgeCheck, Factory, FlaskConical, ShieldCheck } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import { AboutExplore } from "@/components/about-explore";
 import { AboutNav } from "@/components/about-nav";
 import { PageIntro } from "@/components/page-intro";
 import { images } from "@/lib/images";
+import { cleanroom, purification, standards } from "@/lib/quality";
 import { minerals } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -25,36 +13,6 @@ export const metadata: Metadata = {
   description:
     "How SAF purifies water in eight stages, keeps essential minerals, and bottles in a Class 100,000 cleanroom under BSTI, ISO 22000, HACCP, and Halal.",
 };
-
-const process: { name: string; body: string; icon: LucideIcon }[] = [
-  { name: "Sand", body: "Sand filtration traps sediment and suspended particles.", icon: Layers },
-  { name: "Carbon", body: "Activated carbon takes out chlorine, odour, and organic compounds.", icon: Atom },
-  { name: "Sediment", body: "Fine micron filters remove the smallest particles left.", icon: Filter },
-  { name: "Reverse osmosis", body: "A semi-permeable membrane removes dissolved impurities.", icon: Microscope },
-  { name: "Mineral re-infusion", body: "Calcium, magnesium, and potassium go back in at measured targets.", icon: FlaskConical },
-  { name: "UV", body: "Ultraviolet light disinfects the water without added chemicals.", icon: Sun },
-  { name: "Ozone", body: "Ozone gives a final disinfection just before bottling.", icon: Wind },
-  { name: "Cleanroom bottling", body: "Bottles are blown, filled, and capped in a Class 100,000 cleanroom.", icon: Sparkles },
-];
-
-const standards = [
-  {
-    name: "BSTI BDS 1240:2001",
-    body: "The Bangladesh standard for packaged drinking water, from the Bangladesh Standards and Testing Institution.",
-  },
-  {
-    name: "ISO 22000",
-    body: "An international food-safety management system that covers the whole chain, source to shelf.",
-  },
-  {
-    name: "HACCP",
-    body: "Hazard Analysis and Critical Control Points: each risk identified and controlled at the step where it can occur.",
-  },
-  {
-    name: "Halal",
-    body: "Production and materials certified Halal.",
-  },
-];
 
 export default function QualityPage() {
   return (
@@ -82,7 +40,7 @@ export default function QualityPage() {
           </p>
         </div>
         <ol className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {process.map(({ name, body, icon: Icon }, index) => (
+          {purification.map(({ name, body, icon: Icon }, index) => (
             <li
               key={name}
               className="reveal group relative flex flex-col overflow-hidden rounded-[1.75rem] bg-haze p-6 ring-1 ring-ink/[0.05] transition-colors duration-300 hover:bg-lavender"
@@ -118,12 +76,9 @@ export default function QualityPage() {
             </span>
             <h2 className="eyebrow mt-8 text-[#c9b5ff]">Manufacturing</h2>
             <p className="mt-3 text-[clamp(2.25rem,1.4rem+3.4vw,4rem)] leading-[0.95] font-extrabold tracking-[-0.05em]">
-              Class 100,000 cleanroom
+              {cleanroom.title}
             </p>
-            <p className="mt-4 max-w-lg text-white/80">
-              Bottle blowing through cap sealing runs with no human contact until
-              the case is sealed.
-            </p>
+            <p className="mt-4 max-w-lg text-white/80">{cleanroom.body}</p>
           </article>
 
           <div className="reveal rounded-[2rem] bg-white p-8 ring-1 ring-ink/[0.06] sm:p-10 lg:col-span-5">
