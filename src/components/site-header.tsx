@@ -100,18 +100,16 @@ export function SiteHeader() {
     <header className="on-dark fixed inset-x-0 top-0 z-50 text-white">
       <div className="header-shift">
         <div className="hidden h-10 border-b border-white/[0.08] bg-violet text-[0.8125rem] whitespace-nowrap text-white/75 lg:block">
-          <div className="shell flex h-full items-center justify-between gap-6">
-            <ul className="flex items-center gap-6">
-              <li className="flex items-center gap-2">
-                <Truck aria-hidden className="size-4 text-[#c9b5ff]" />
-                Home and office delivery across Dhaka
-              </li>
-              <li className="flex items-center gap-2">
-                <ShieldCheck aria-hidden className="size-4 text-[#c9b5ff]" />
-                BSTI &amp; ISO 22000 certified
-              </li>
-            </ul>
+          <div className="shell grid h-full grid-cols-[1fr_auto_1fr] items-center gap-6">
+            <p className="flex items-center gap-2 justify-self-start">
+              <Truck aria-hidden className="size-4 text-[#c9b5ff]" />
+              Home and office delivery across Dhaka
+            </p>
             <p className="flex items-center gap-2">
+              <ShieldCheck aria-hidden className="size-4 text-[#c9b5ff]" />
+              BSTI &amp; ISO 22000 certified
+            </p>
+            <p className="flex items-center gap-2 justify-self-end">
               <Phone aria-hidden className="size-4 text-[#c9b5ff]" />
               Hotline
               <span className="font-semibold text-white tabular-nums">{company.hotline}</span>
