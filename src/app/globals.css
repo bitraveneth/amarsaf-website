@@ -1,26 +1,288 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
+/* Brand tokens. Primary purple drives actions; the rest stay quiet. */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-jakarta), "Plus Jakarta Sans", sans-serif;
+  --font-heading: var(--font-jakarta), "Plus Jakarta Sans", sans-serif;
+  --color-purple: #6d2bd5;
+  --color-purple-deep: #5520ae;
+  --color-violet: #2a0e5c;
+  --color-night: #170a35;
+  --color-indigo: #4b2cd7;
+  --color-ink: #0e0f14;
+  --color-lavender: #ece7f8;
+  --color-haze: #f7f5fc;
+  --color-mist: #f3f4f6;
+  --color-fresh: #22b573;
+  --color-pink: #eb38f8;
+  --color-cool: #94a3b8;
+  --color-white: #ffffff;
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  --background: #ffffff;
+  --foreground: #0e0f14;
+  --card: #ffffff;
+  --card-foreground: #0e0f14;
+  --popover: #ffffff;
+  --popover-foreground: #0e0f14;
+  --primary: #6d2bd5;
+  --primary-foreground: #ffffff;
+  --secondary: #ece7f8;
+  --secondary-foreground: #0e0f14;
+  --muted: #f3f4f6;
+  --muted-foreground: #3c4254;
+  --accent: #ece7f8;
+  --accent-foreground: #4b2cd7;
+  --destructive: #9f1239;
+  --border: #e4e2ec;
+  --input: #d6d3e2;
+  --ring: #6d2bd5;
+  --chart-1: #6d2bd5;
+  --chart-2: #4b2cd7;
+  --chart-3: #22b573;
+  --chart-4: #eb38f8;
+  --chart-5: #94a3b8;
+  --radius: 0.75rem;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #0e0f14;
+  --sidebar-primary: #6d2bd5;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #ece7f8;
+  --sidebar-accent-foreground: #0e0f14;
+  --sidebar-border: #e4e2ec;
+  --sidebar-ring: #6d2bd5;
+  --focus-ring: #6d2bd5;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply font-sans;
+    /* Keeps layout width fixed when the mobile menu locks scrolling. */
+    scrollbar-gutter: stable;
+  }
+  body {
+    @apply bg-white text-ink antialiased;
+    font-weight: 400;
+    line-height: 1.7;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.08;
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  a:focus-visible,
+  button:focus-visible,
+  summary:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible,
+  [tabindex]:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 3px;
+  }
+  [id] {
+    scroll-margin-top: 7rem;
+  }
+  ::selection {
+    background: #6d2bd5;
+    color: #ffffff;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Dark surfaces flip the focus ring so it stays visible on violet. */
+.on-dark {
+  --focus-ring: #ffffff;
+}
+
+@utility shell {
+  width: 100%;
+  max-width: 84rem;
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+  @media (width >= 40rem) {
+    padding-inline: 2rem;
+  }
+  @media (width >= 64rem) {
+    padding-inline: 2.5rem;
+  }
+}
+
+@utility eyebrow {
+  font-size: 0.75rem;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+@utility text-display {
+  font-size: clamp(2.75rem, 1.5rem + 6.2vw, 7.25rem);
+  line-height: 0.94;
+  letter-spacing: -0.045em;
+  font-weight: 800;
+}
+
+@utility text-headline {
+  font-size: clamp(2.125rem, 1.35rem + 3.4vw, 4.5rem);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  font-weight: 800;
+}
+
+@utility text-title {
+  font-size: clamp(1.5rem, 1.15rem + 1.3vw, 2.25rem);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  font-weight: 700;
+}
+
+@utility text-lede {
+  font-size: clamp(1.0625rem, 0.98rem + 0.4vw, 1.3125rem);
+  line-height: 1.6;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(1.25rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes settle {
+  from {
+    transform: scale(1.08);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+/* Drives hero slide timing: the slider advances on animationend. */
+@keyframes slide-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.slide-progress {
+  animation-name: slide-progress;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+/* Slides the desktop info strip (h-10) out of view once the page scrolls. */
+@keyframes header-shift {
+  to {
+    transform: translateY(-2.5rem);
+  }
+}
+
+/* Sticky offset for bars that dock under the header: 4rem bar on mobile, strip + bar on desktop. */
+.below-header {
+  top: 4rem;
+  @media (width >= 64rem) {
+    top: 7rem;
+  }
+}
+
+@keyframes header-solid {
+  to {
+    background-color: rgb(23 10 53 / 0.96);
+    box-shadow: 0 18px 40px -24px rgb(0 0 0 / 0.7);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .rise {
+    animation: rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: var(--delay, 0ms);
+  }
+  .settle {
+    animation: settle 2.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 45%;
+    }
+  }
+  @supports (animation-timeline: scroll()) {
+    @media (width >= 64rem) {
+      /* The strip has slid away by the time anything docks, so only the bar remains. */
+      .below-header {
+        top: 4.5rem;
+      }
+      .header-shift {
+        animation: header-shift linear both;
+        animation-timeline: scroll(root);
+        animation-range: 0 5rem;
+      }
+    }
+    .header-solid {
+      animation: header-solid linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 8rem;
+    }
+  }
 }
