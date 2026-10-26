@@ -1,0 +1,266 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  SUPERADMIN
+  ADMIN
+  STAFF
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String?
+  passwordHash String
+  role         Role     @default(STAFF)
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Media {
+  id        String   @id @default(cuid())
+  url       String
+  alt       String   @default("")
+  width     Int?
+  height    Int?
+  filename  String?
+  mimeType  String?
+  sizeBytes Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  heroSlides       HeroSlide[]
+  productsPack     Product[]   @relation("ProductPack")
+  productsLife     Product[]   @relation("ProductLifestyle")
+  newsPosts        NewsPost[]
+  sectionBlocks    SectionBlock[]
+}
+
+model SiteSettings {
+  id             Int      @id @default(1)
+  companyName    String
+  tagline        String
+  addressLines   String[]
+  hotline        String
+  email          String
+  seoTitle       String?
+  seoDescription String?
+  /// Optional thin banner above the main nav on the public site
+  noticeEnabled  Boolean  @default(false)
+  noticeText     String?
+  noticeHref     String?
+  updatedAt      DateTime @updatedAt
+}
+
+model NavItem {
+  id        String  @id @default(cuid())
+  href      String
+  label     String
+  order     Int     @default(0)
+  isPublished Boolean @default(true)
+}
+
+model SocialLink {
+  id        String  @id @default(cuid())
+  key       String  @unique
+  label     String
+  href      String
+  order     Int     @default(0)
+  isPublished Boolean @default(true)
+}
+
+model HeroSlide {
+  id            String  @id @default(cuid())
+  key           String  @unique
+  tab           String
+  eyebrow       String
+  title         String
+  body          String
+  focus         String?
+  ctaHref       String
+  ctaLabel      String
+  secondaryHref String?
+  secondaryLabel String?
+  order         Int     @default(0)
+  isPublished   Boolean @default(true)
+  mediaId       String?
+  media         Media?  @relation(fields: [mediaId], references: [id])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Page {
+  id             String    @id @default(cuid())
+  slug           String    @unique
+  title          String
+  seoTitle       String?
+  seoDescription String?
+  isPublished    Boolean   @default(true)
+  sections       Section[]
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model Section {
+  id          String         @id @default(cuid())
+  pageId      String
+  page        Page           @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  key         String
+  title       String?
+  order       Int            @default(0)
+  isPublished Boolean        @default(true)
+  blocks      SectionBlock[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@unique([pageId, key])
+}
+
+model SectionBlock {
+  id        String   @id @default(cuid())
+  sectionId String
+  section   Section  @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  key       String?
+  type      String   @default("text")
+  order     Int      @default(0)
+  data      Json
+  mediaId   String?
+  media     Media?   @relation(fields: [mediaId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  size        String
+  pack        String
+  whereUsed   String
+  feature     String
+  summary     String
+  tagline     String?
+  description String?
+  order       Int      @default(0)
+  isPublished Boolean  @default(true)
+  packMediaId String?
+  packMedia   Media?   @relation("ProductPack", fields: [packMediaId], references: [id])
+  lifeMediaId String?
+  lifeMedia   Media?   @relation("ProductLifestyle", fields: [lifeMediaId], references: [id])
+  highlights  ProductHighlight[]
+  specs       ProductSpec[]
+  faqs        ProductFaq[]
+  idealFor    Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ProductHighlight {
+  id        String  @id @default(cuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  iconKey   String?
+  title     String
+  body      String
+  order     Int     @default(0)
+}
+
+model ProductSpec {
+  id        String  @id @default(cuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  label     String
+  value     String
+  order     Int     @default(0)
+}
+
+model ProductFaq {
+  id        String  @id @default(cuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  question  String
+  answer    String
+  order     Int     @default(0)
+}
+
+model NewsPost {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  body        String
+  dateLabel   String
+  publishedAt DateTime
+  order       Int      @default(0)
+  isPublished Boolean  @default(true)
+  mediaId     String?
+  media       Media?   @relation(fields: [mediaId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model FaqItem {
+  id          String   @id @default(cuid())
+  question    String
+  answer      String
+  order       Int      @default(0)
+  isPublished Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Job {
+  id           String   @id @default(cuid())
+  slug         String   @unique
+  title        String
+  team         String
+  experience   String
+  location     String
+  type         String
+  summary      String
+  requirements String[]
+  order        Int      @default(0)
+  isPublished  Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model CareerPage {
+  id             Int      @id @default(1)
+  title          String?
+  intro          String?
+  seoTitle       String?
+  seoDescription String?
+  updatedAt      DateTime @updatedAt
+}
+
+model ContactSettings {
+  id             Int      @id @default(1)
+  enquiryTypes   Json
+  businessNeeds  String[]
+  supportTopics  String[]
+  updatedAt      DateTime @updatedAt
+}
+
+model LegalDoc {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  label       String
+  title       String
+  description String
+  intro       String
+  sections    Json
+  updatedLabel String?
+  updatedIso   String?
+  order       Int      @default(0)
+  isPublished Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

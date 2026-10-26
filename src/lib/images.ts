@@ -3,7 +3,7 @@ import aboutBottlingLine from "../../public/images/about-bottling-line.jpg";
 import aboutMissionHero from "../../public/images/about-mission-hero.jpg";
 import aboutSustainabilityHero from "../../public/images/about-sustainability-hero.jpg";
 import heritagePlant from "../../public/images/heritage-plant.jpg";
-import waterPour from "../../public/images/hero-slide-minerals.jpg";
+import waterPour from "../../public/images/know-what-you-drink.jpg";
 import cleanroomHall from "../../public/images/hero-slide-cleanroom.jpg";
 import heritageMonumentsBand from "../../public/images/heritage-monuments-band.jpg";
 import leaderPlaceholder from "../../public/images/leader-placeholder.jpg";
@@ -11,10 +11,10 @@ import lifestyleOffice from "../../public/images/lifestyle-office.jpg";
 import newsLabTesting from "../../public/images/news-lab-testing.jpg";
 import newsLaunch from "../../public/images/news-launch.jpg";
 import newsOfficeJars from "../../public/images/news-office-jars.jpg";
-import product18l from "../../public/images/product-18l-square.jpg";
-import product1l from "../../public/images/product-1l-square.jpg";
-import product2l from "../../public/images/product-2l-square.jpg";
-import product500ml from "../../public/images/product-500ml-square.jpg";
+import product18l from "../../public/images/product-18l-square.png";
+import product1l from "../../public/images/product-1l-square.png";
+import product2l from "../../public/images/product-2l-square.png";
+import product500ml from "../../public/images/product-500ml-square.png";
 import productCommercialLife from "../../public/images/product-commercial-life.jpg";
 import productDailyLife from "../../public/images/product-daily-life.jpg";
 import productExecutiveLife from "../../public/images/product-executive-life.jpg";
@@ -26,7 +26,7 @@ export type SiteImage = { src: StaticImageData; alt: string };
 export const images = {
   bottlingLine: {
     src: aboutBottlingLine,
-    alt: "Clear bottles with purple caps moving along an automated filling line inside a white cleanroom.",
+    alt: "SAF bottles with purple caps and labels moving along an automated filling line inside a white cleanroom.",
   },
   heritage: {
     src: heritagePlant,
@@ -46,7 +46,7 @@ export const images = {
   },
   lineup: {
     src: newsLaunch,
-    alt: "Four SAF containers in a row, from the 500 ml bottle to the 18 L jar, on a violet surface.",
+    alt: "Four SAF containers in a row, from the 500 ml bottle to the 18.9 L jar, on a violet surface.",
   },
   officeJars: {
     src: newsOfficeJars,
@@ -62,7 +62,7 @@ export const images = {
   },
   pour: {
     src: waterPour,
-    alt: "Clear water pouring into a crystal glass, droplets lit by violet light.",
+    alt: "Clear water pouring into a crystal glass beside a SAF bottle, lit by violet light.",
   },
   mission: {
     src: aboutMissionHero,
@@ -85,7 +85,7 @@ export const productImages: Record<string, SiteImage> = {
   },
   "saf-executive": {
     src: product1l,
-    alt: "SAF Executive 1.0 L bottle with a purple label and cap.",
+    alt: "SAF Executive 1 L bottle with a purple label and cap.",
   },
   "saf-family": {
     src: product2l,
@@ -108,10 +108,10 @@ export const productLifestyle: Record<string, SiteImage> = {
   },
   "saf-family": {
     src: productFamilyLife,
-    alt: "A SAF Family 2 L bottle with a moulded handle on a family dinner table with glasses of water.",
+    alt: "A SAF Family 2 L bottle on a family dinner table with glasses of water and Bangladeshi dishes.",
   },
   "saf-commercial": {
     src: productCommercialLife,
-    alt: "A SAF Commercial 18 L jar on a white water dispenser in a sunlit office pantry.",
+    alt: "A SAF Commercial 18.9 L jar on a white water dispenser in a sunlit office pantry.",
   },
 };

@@ -2,28 +2,46 @@ import { ArrowUpRight, Package } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { productImages } from "@/lib/images";
-import type { products } from "@/lib/site";
 
-type Product = (typeof products)[number];
+export type ProductCardData = {
+  slug: string;
+  name: string;
+  size: string;
+  pack: string;
+  where: string;
+  packImage?: { src: string; alt: string } | null;
+};
 
-export function ProductCard({ product, priority = false }: { product: Product; priority?: boolean }) {
-  const image = productImages[product.id];
+export function ProductCard({
+  product,
+  priority = false,
+}: {
+  product: ProductCardData;
+  priority?: boolean;
+}) {
+  const fallback = productImages[product.slug];
+  const image = product.packImage ?? (fallback ? { src: fallback.src, alt: fallback.alt } : null);
 
   return (
     <Link
-      href={`/products/${product.id}`}
+      href={`/products/${product.slug}`}
       className="group flex h-full flex-col overflow-hidden rounded-[1.75rem] bg-white ring-1 ring-ink/[0.06] transition-[translate,box-shadow] duration-500 ease-out hover:-translate-y-1 hover:shadow-[0_36px_70px_-40px_rgb(23_10_53/0.5)] motion-reduce:transition-none"
     >
       <span className="relative block overflow-hidden bg-[#ece9f3]">
-        <Image
-          src={image.src}
-          alt=""
-          placeholder="blur"
-          preload={priority}
-          fetchPriority={priority ? "high" : "auto"}
-          sizes="(min-width: 1024px) 22vw, (min-width: 640px) 45vw, 48vw"
-          className="aspect-square h-auto w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06] motion-reduce:transition-none"
-        />
+        {image ? (
+          <Image
+            src={image.src}
+            alt=""
+            width={640}
+            height={640}
+            preload={priority}
+            fetchPriority={priority ? "high" : "auto"}
+            sizes="(min-width: 1024px) 22vw, (min-width: 640px) 45vw, 48vw"
+            className="aspect-square h-auto w-full object-contain p-5 sm:p-7 transition-transform duration-700 ease-out group-hover:scale-[1.04] motion-reduce:transition-none"
+          />
+        ) : (
+          <span className="aspect-square block bg-[#ece9f3]" />
+        )}
         <span className="absolute top-3 left-3 rounded-full bg-white px-3 py-1 text-sm font-bold text-purple shadow-sm sm:top-4 sm:left-4">
           {product.size}
         </span>

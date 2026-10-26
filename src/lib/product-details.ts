@@ -83,7 +83,7 @@ export const productDetails: Record<string, Detail> = {
       { icon: CarFront, label: "Travel" },
     ],
     specs: [
-      { label: "Volume", value: "1.0 L" },
+      { label: "Volume", value: "1 L" },
       { label: "Case", value: "12 bottles" },
       { label: "Bottle", value: "Durable BPA-free rPET" },
       ...water,

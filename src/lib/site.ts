@@ -51,7 +51,7 @@ export const products = [
   {
     id: "saf-executive",
     name: "SAF Executive",
-    size: "1.0 L",
+    size: "1 L",
     pack: "12 bottles / case",
     where: "Gyms, long meetings, restaurants",
     feature: "Durable rPET",

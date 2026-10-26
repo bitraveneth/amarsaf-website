@@ -2,42 +2,51 @@ import { ArrowUpRight, Mail, MapPin, Phone, ShieldCheck } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { SocialIcon } from "@/components/social-icon";
-import { legalDocs } from "@/lib/legal";
-import { certifications, company, products, socials } from "@/lib/site";
+import { getLegalDocs } from "@/lib/cms/legal";
+import { getProducts } from "@/lib/cms/products";
+import { getSiteSettings } from "@/lib/cms/settings";
+import { certifications, type SocialId } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
-const columns = [
-  {
-    label: "Brand",
-    links: [
-      { href: "/about", label: "About us" },
-      { href: "/heritage", label: "Heritage" },
-      { href: "/careers", label: "Careers" },
-      { href: "/news", label: "News" },
-      { href: "/media-kit", label: "Media kit" },
-    ],
-  },
-  {
-    label: "Help",
-    links: [
-      { href: "/faq", label: "FAQ" },
-      { href: "/contact", label: "Contact" },
-    ],
-  },
-  {
-    label: "Products",
-    links: products.map((product) => ({
-      href: `/products/${product.id}`,
-      label: `${product.name} ${product.size}`,
-    })),
-  },
-  {
-    label: "Legal",
-    links: legalDocs.map((doc) => ({ href: `/legal/${doc.slug}`, label: doc.label })),
-  },
-];
+export async function SiteFooter() {
+  const [settings, products, legalDocs] = await Promise.all([
+    getSiteSettings(),
+    getProducts(),
+    getLegalDocs(),
+  ]);
+  const { company, socials } = settings;
 
-export function SiteFooter() {
+  const columns = [
+    {
+      label: "Brand",
+      links: [
+        { href: "/about", label: "About us" },
+        { href: "/heritage", label: "Heritage" },
+        { href: "/careers", label: "Careers" },
+        { href: "/news", label: "News" },
+        { href: "/media-kit", label: "Media kit" },
+      ],
+    },
+    {
+      label: "Help",
+      links: [
+        { href: "/faq", label: "FAQ" },
+        { href: "/contact", label: "Contact" },
+      ],
+    },
+    {
+      label: "Products",
+      links: products.map((product) => ({
+        href: `/products/${product.slug}`,
+        label: `${product.name} ${product.size}`,
+      })),
+    },
+    {
+      label: "Legal",
+      links: legalDocs.map((doc) => ({ href: `/legal/${doc.slug}`, label: doc.label })),
+    },
+  ];
+
   return (
     <footer className="px-3 pb-3 sm:px-5 sm:pb-5">
       <div className="on-dark relative isolate overflow-hidden rounded-[2rem] bg-night text-white sm:rounded-[2.5rem]">
@@ -112,7 +121,7 @@ export function SiteFooter() {
                         aria-label={`SAF on ${social.label} (opens in a new tab)`}
                         className="flex size-11 items-center justify-center rounded-full bg-white/[0.07] text-white/85 ring-1 ring-white/15 transition-colors hover:bg-white hover:text-purple"
                       >
-                        <SocialIcon id={social.id} className="size-[1.125rem]" />
+                        <SocialIcon id={social.id as SocialId} className="size-[1.125rem]" />
                       </a>
                     </li>
                   ))}

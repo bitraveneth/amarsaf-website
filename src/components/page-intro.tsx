@@ -17,7 +17,7 @@ export function PageIntro({
   lede,
   image,
   imagePosition = "center",
-  tone = "lavender",
+  tone = "night",
   overlap = false,
   children,
 }: {
@@ -62,17 +62,25 @@ export function PageIntro({
           />
         </>
       ) : (
-        <div
-          aria-hidden
-          className={cn(
-            "pointer-events-none absolute -top-10 -right-32 -z-10 hidden h-[30rem] w-[44rem] [mask-image:radial-gradient(closest-side,black,transparent)] md:block",
-            tone === "night" ? "opacity-[0.08]" : "opacity-[0.12]",
-          )}
-          style={{
-            backgroundImage: `url(/brand/${tone === "night" ? "pattern-1-white" : "pattern-1"}.svg)`,
-            backgroundSize: "340px auto",
-          }}
-        />
+        <>
+          {tone === "night" ? (
+            <div
+              aria-hidden
+              className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_100%_0%,rgb(109_43_213/0.45),transparent_55%)]"
+            />
+          ) : null}
+          <div
+            aria-hidden
+            className={cn(
+              "pointer-events-none absolute -top-10 -right-32 -z-10 hidden h-[30rem] w-[44rem] [mask-image:radial-gradient(closest-side,black,transparent)] md:block",
+              tone === "night" ? "opacity-[0.08]" : "opacity-[0.12]",
+            )}
+            style={{
+              backgroundImage: `url(/brand/${tone === "night" ? "pattern-1-white" : "pattern-1"}.svg)`,
+              backgroundSize: "340px auto",
+            }}
+          />
+        </>
       )}
       <div
         className={cn(

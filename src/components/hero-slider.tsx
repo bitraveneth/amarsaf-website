@@ -12,7 +12,7 @@ import {
   type KeyboardEvent,
   type PointerEvent,
 } from "react";
-import type { HeroSlide } from "@/lib/hero-slides";
+import type { CmsHeroSlide } from "@/lib/cms/types";
 import { cn, delay } from "@/lib/utils";
 
 const SLIDE_MS = 7000;
@@ -28,7 +28,7 @@ function subscribeReducedMotion(onChange: () => void) {
 const ctaBase =
   "inline-flex h-12 items-center justify-center gap-2 rounded-full px-6 text-[0.9375rem] font-semibold transition-colors";
 
-export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
+export function HeroSlider({ slides }: { slides: CmsHeroSlide[] }) {
   const count = slides.length;
   const [index, setIndex] = useState(0);
   // null = follow the default (autoplay unless the visitor prefers reduced motion).
@@ -113,15 +113,15 @@ export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
             )}
           >
             <Image
-              src={item.image}
-              alt={item.alt}
+              src={item.image.src}
+              alt={item.image.alt}
+              fill
               sizes="100vw"
               preload={active}
               fetchPriority={active ? "high" : "low"}
-              quality={65}
-              placeholder="blur"
+              quality={90}
               className={cn(
-                "h-full w-full object-cover transition-transform duration-[9000ms] ease-out motion-reduce:transition-none",
+                "object-cover transition-transform duration-[9000ms] ease-out motion-reduce:transition-none",
                 active ? "scale-100" : "scale-[1.12]",
               )}
               style={{ objectPosition: item.focus ?? "center" }}
@@ -226,7 +226,13 @@ export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
                           active ? "ring-white" : "opacity-60 ring-white/20 group-hover:opacity-100",
                         )}
                       >
-                        <Image src={item.image} alt="" sizes="44px" className="h-full w-full object-cover" />
+                        <Image
+                          src={item.image.src}
+                          alt=""
+                          fill
+                          sizes="44px"
+                          className="object-cover"
+                        />
                       </span>
                       <span className="min-w-0">
                         <span className="block text-[0.6875rem] font-semibold text-white/55 tabular-nums">
