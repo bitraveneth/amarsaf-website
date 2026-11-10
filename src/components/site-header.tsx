@@ -20,8 +20,15 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState, type KeyboardEvent } from "react";
 import { aboutPages } from "@/lib/about";
 import { images, productImages } from "@/lib/images";
-import { company, isCurrentPath, nav, products, stories } from "@/lib/site";
+import { company as staticCompany, isCurrentPath, nav, products, stories } from "@/lib/site";
 import { cn } from "@/lib/utils";
+
+export type HeaderBarContent = {
+  delivery: string;
+  cert: string;
+  hotline: string;
+  email: string;
+};
 
 const aboutLinks = [
   {
@@ -76,8 +83,19 @@ function Chevron() {
   );
 }
 
-export function SiteHeader() {
+export function SiteHeader({
+  headerBar,
+}: {
+  headerBar?: HeaderBarContent;
+} = {}) {
   const pathname = usePathname();
+  const company = {
+    ...staticCompany,
+    hotline: headerBar?.hotline || staticCompany.hotline,
+    email: headerBar?.email || staticCompany.email,
+  };
+  const deliveryLine = headerBar?.delivery || "Home and office delivery across Dhaka";
+  const certLine = headerBar?.cert || "BSTI & ISO 22000 certified";
   // Tied to the path it was opened on, so any navigation closes the menu.
   const [openPath, setOpenPath] = useState<string | null>(null);
   const open = openPath === pathname;
@@ -103,11 +121,11 @@ export function SiteHeader() {
           <div className="shell grid h-full grid-cols-[1fr_auto_1fr] items-center gap-6">
             <p className="flex items-center gap-2 justify-self-start">
               <Truck aria-hidden className="size-4 text-[#c9b5ff]" />
-              Home and office delivery across Dhaka
+              {deliveryLine}
             </p>
             <p className="flex items-center gap-2">
               <ShieldCheck aria-hidden className="size-4 text-[#c9b5ff]" />
-              BSTI &amp; ISO 22000 certified
+              {certLine}
             </p>
             <p className="flex items-center gap-2 justify-self-end">
               <Phone aria-hidden className="size-4 text-[#c9b5ff]" />
@@ -536,7 +554,7 @@ export function SiteHeader() {
                             <Truck aria-hidden className="size-4 text-[#c9b5ff]" />
                             <span className="sr-only">Delivery</span>
                           </dt>
-                          <dd>Home and office delivery across Dhaka</dd>
+                          <dd>{deliveryLine}</dd>
                         </div>
                       </dl>
                     </div>

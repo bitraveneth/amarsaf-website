@@ -15,7 +15,6 @@ import {
   Store,
   type LucideIcon,
 } from "lucide-react";
-import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { HeroSlider } from "@/components/hero-slider";
@@ -31,6 +30,7 @@ import { getHeroSlides } from "@/lib/cms/hero";
 import { getNewsPosts } from "@/lib/cms/news";
 import { getProducts } from "@/lib/cms/products";
 import { getSection } from "@/lib/cms/sections";
+import { metadataForEntry } from "@/lib/cms/seo";
 import { getSiteSettings } from "@/lib/cms/settings";
 import { images, productLifestyle } from "@/lib/images";
 import {
@@ -40,13 +40,16 @@ import {
 } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
-export const metadata: Metadata = {
-  title: {
-    absolute: "SAF Packaged Drinking Water | Simply Pure Hydration Bangladesh",
-  },
-  description:
-    "Order SAF packaged drinking water online. 8-stage purified water with essential minerals for home and office delivery across Dhaka.",
-};
+export async function generateMetadata() {
+  return metadataForEntry({
+    kind: "page",
+    slug: "home",
+    absoluteTitle: true,
+    fallbackTitle: "SAF Packaged Drinking Water | Simply Pure Hydration Bangladesh",
+    fallbackDescription:
+      "Order SAF packaged drinking water online. 8-stage purified water with essential minerals for home and office delivery across Dhaka.",
+  });
+}
 
 const ways = [
   {

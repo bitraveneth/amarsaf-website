@@ -4,6 +4,7 @@ import { Prisma, PrismaClient, type Role } from "@prisma/client";
 import { jobs } from "../src/lib/careers";
 import { legalDocs, legalUpdated } from "../src/lib/legal";
 import {
+  certifications,
   company,
   faqs,
   nav,
@@ -330,9 +331,16 @@ async function main() {
       addressLines: [...company.address],
       hotline: company.hotline,
       email: company.email,
+      headerDelivery: "Home and office delivery across Dhaka",
+      headerCert: "BSTI & ISO 22000 certified",
+      footerCopyright: `© 2026 ${company.name}`,
+      footerCertifications: [...certifications],
       seoTitle: "SAF Packaged Drinking Water | Simply Pure Hydration Bangladesh",
       seoDescription:
         "Order SAF packaged drinking water online. 8-stage purified water with essential minerals for home and office delivery across Dhaka.",
+      seoKeywords: "SAF water, packaged drinking water, Dhaka, mineral water",
+      titleTemplate: "%s | SAF Water",
+      allowIndexing: true,
     },
     update: {
       companyName: company.name,
@@ -340,6 +348,15 @@ async function main() {
       addressLines: [...company.address],
       hotline: company.hotline,
       email: company.email,
+      headerDelivery: "Home and office delivery across Dhaka",
+      headerCert: "BSTI & ISO 22000 certified",
+      footerCopyright: `© 2026 ${company.name}`,
+      footerCertifications: [...certifications],
+      seoTitle: "SAF Packaged Drinking Water | Simply Pure Hydration Bangladesh",
+      seoDescription:
+        "Order SAF packaged drinking water online. 8-stage purified water with essential minerals for home and office delivery across Dhaka.",
+      seoKeywords: "SAF water, packaged drinking water, Dhaka, mineral water",
+      titleTemplate: "%s | SAF Water",
     },
   });
 
@@ -414,6 +431,8 @@ async function main() {
         summary: p.summary,
         tagline: detail?.tagline,
         description: detail?.description,
+        seoTitle: `${p.name} ${p.size}`,
+        seoDescription: detail?.description ?? p.summary,
         order,
         isPublished: true,
         packMediaId: mediaIds.get(productPackKey[p.id] ?? "") ?? null,
@@ -429,6 +448,8 @@ async function main() {
         summary: p.summary,
         tagline: detail?.tagline,
         description: detail?.description,
+        seoTitle: `${p.name} ${p.size}`,
+        seoDescription: detail?.description ?? p.summary,
         order,
         packMediaId: mediaIds.get(productPackKey[p.id] ?? "") ?? null,
         lifeMediaId: mediaIds.get(productLifeKey[p.id] ?? "") ?? null,
@@ -573,6 +594,8 @@ async function main() {
         label: doc.label,
         title: doc.title,
         description: doc.description,
+        seoTitle: doc.title,
+        seoDescription: doc.description,
         intro: doc.intro,
         sections: doc.sections,
         updatedLabel: legalUpdated.label,
@@ -584,6 +607,8 @@ async function main() {
         label: doc.label,
         title: doc.title,
         description: doc.description,
+        seoTitle: doc.title,
+        seoDescription: doc.description,
         intro: doc.intro,
         sections: doc.sections,
         updatedLabel: legalUpdated.label,
@@ -604,7 +629,11 @@ async function main() {
         "Order SAF packaged drinking water online. 8-stage purified water with essential minerals for home and office delivery across Dhaka.",
       isPublished: true,
     },
-    update: {},
+    update: {
+      seoTitle: "SAF Packaged Drinking Water | Simply Pure Hydration Bangladesh",
+      seoDescription:
+        "Order SAF packaged drinking water online. 8-stage purified water with essential minerals for home and office delivery across Dhaka.",
+    },
   });
 
   const homeSections: {
@@ -823,15 +852,101 @@ async function main() {
     }
   }
 
-  for (const slug of ["about", "careers", "contact", "faq", "products", "news"] as const) {
+  const pageSeo: { slug: string; title: string; seoTitle: string; seoDescription: string }[] = [
+    {
+      slug: "about",
+      title: "About",
+      seoTitle: "About Us",
+      seoDescription:
+        "SAF is a Bangladeshi food and beverage brand. We bottle laboratory-verified, mineral-balanced drinking water in Bashundhara, Dhaka.",
+    },
+    {
+      slug: "about/mission-vision",
+      title: "Mission & Vision",
+      seoTitle: "Mission & Vision",
+      seoDescription:
+        "SAF's mission, vision, goals, and core values: pure, nutritious, and reliable food and beverages that consumers trust.",
+    },
+    {
+      slug: "about/quality",
+      title: "Quality & Safety",
+      seoTitle: "Quality & Safety",
+      seoDescription:
+        "How SAF purifies water in eight stages, keeps essential minerals, and bottles in a Class 100,000 cleanroom under BSTI, ISO 22000, HACCP, and Halal.",
+    },
+    {
+      slug: "about/sustainability",
+      title: "Sustainability",
+      seoTitle: "Sustainability",
+      seoDescription:
+        "Recyclable BPA-free rPET bottles, returnable 18 L jars, and process water recovered inside the SAF plant in Bashundhara.",
+    },
+    {
+      slug: "products",
+      title: "Products",
+      seoTitle: "Products",
+      seoDescription:
+        "SAF Daily 500 ml, Executive 1 L, Family 2 L, and Commercial 18 L returnable jars for home and office.",
+    },
+    {
+      slug: "news",
+      title: "News",
+      seoTitle: "News",
+      seoDescription:
+        "Notes from SAF: the brand launch, BSTI and ISO certification, and office jar delivery in Dhaka.",
+    },
+    {
+      slug: "faq",
+      title: "FAQ",
+      seoTitle: "FAQ",
+      seoDescription:
+        "Answers on SAF 8-stage purification, minerals, Dhaka delivery, returnable 18 L jars, certifications, and starting a supply.",
+    },
+    {
+      slug: "contact",
+      title: "Contact",
+      seoTitle: "Contact",
+      seoDescription:
+        "Contact SAF Food & Beverage Ltd. in Bashundhara, Dhaka: product enquiries, business and distribution, customer support, and careers.",
+    },
+    {
+      slug: "careers",
+      title: "Careers",
+      seoTitle: "Careers",
+      seoDescription:
+        "Work at SAF Food & Beverage Ltd. in Dhaka: open roles in sales, quality, production, logistics, marketing, and customer care.",
+    },
+    {
+      slug: "heritage",
+      title: "Heritage",
+      seoTitle: "Heritage",
+      seoDescription:
+        "The SAF story: how SAF Food & Beverage Ltd. grew from one belief to a certified plant in Bashundhara, and what comes next.",
+    },
+    {
+      slug: "media-kit",
+      title: "Media Kit",
+      seoTitle: "Media Kit",
+      seoDescription:
+        "Download SAF logos, colours, typography, patterns, and the brand guidelines for press, retail, and partner use.",
+    },
+  ];
+
+  for (const page of pageSeo) {
     await prisma.page.upsert({
-      where: { slug },
+      where: { slug: page.slug },
       create: {
-        slug,
-        title: slug.charAt(0).toUpperCase() + slug.slice(1),
+        slug: page.slug,
+        title: page.title,
+        seoTitle: page.seoTitle,
+        seoDescription: page.seoDescription,
         isPublished: true,
       },
-      update: {},
+      update: {
+        title: page.title,
+        seoTitle: page.seoTitle,
+        seoDescription: page.seoDescription,
+      },
     });
   }
 

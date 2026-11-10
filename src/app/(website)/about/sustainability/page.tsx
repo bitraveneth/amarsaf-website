@@ -1,16 +1,20 @@
 import { ArrowRight, RotateCcw } from "lucide-react";
-import type { Metadata } from "next";
+import { metadataForEntry } from "@/lib/cms/seo";
 import { AboutExplore } from "@/components/about-explore";
 import { AboutNav } from "@/components/about-nav";
 import { PageIntro } from "@/components/page-intro";
 import { images } from "@/lib/images";
 import { careTips, commitments, jarLoop } from "@/lib/sustainability";
 
-export const metadata: Metadata = {
-  title: "Sustainability",
-  description:
-    "Recyclable BPA-free rPET bottles, returnable 18 L jars, and process water recovered inside the SAF plant in Bashundhara.",
-};
+export async function generateMetadata() {
+  return metadataForEntry({
+    kind: "page",
+    slug: "about/sustainability",
+    fallbackTitle: "Sustainability",
+    fallbackDescription:
+      "Recyclable BPA-free rPET bottles, returnable 18 L jars, and process water recovered inside the SAF plant in Bashundhara.",
+  });
+}
 
 export default function SustainabilityPage() {
   return (

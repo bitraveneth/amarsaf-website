@@ -1,15 +1,19 @@
-import type { Metadata } from "next";
 import Image from "next/image";
+import { metadataForEntry } from "@/lib/cms/seo";
 import { PageIntro } from "@/components/page-intro";
 import { images } from "@/lib/images";
 import { milestones, monuments } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
-export const metadata: Metadata = {
-  title: "Heritage",
-  description:
-    "The SAF story: how SAF Food & Beverage Ltd. grew from one belief to a certified plant in Bashundhara, and what comes next.",
-};
+export async function generateMetadata() {
+  return metadataForEntry({
+    kind: "page",
+    slug: "heritage",
+    fallbackTitle: "Heritage",
+    fallbackDescription:
+      "The SAF story: how SAF Food & Beverage Ltd. grew from one belief to a certified plant in Bashundhara, and what comes next.",
+  });
+}
 
 export default function HeritagePage() {
   return (

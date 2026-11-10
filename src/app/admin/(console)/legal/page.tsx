@@ -35,7 +35,10 @@ export default async function AdminLegalPage({
   searchParams: Promise<{ saved?: string; error?: string }>;
 }) {
   const user = await requireAdmin();
-  const docs = await prisma.legalDoc.findMany({ orderBy: { order: "asc" } });
+  const [docs, media] = await Promise.all([
+    prisma.legalDoc.findMany({ orderBy: { order: "asc" } }),
+    prisma.media.findMany({ orderBy: { createdAt: "desc" } }),
+  ]);
   const params = await searchParams;
 
   async function save(formData: FormData) {
@@ -64,6 +67,13 @@ export default async function AdminLegalPage({
     updatedIso: doc.updatedIso,
     order: doc.order,
     isPublished: doc.isPublished,
+    seoTitle: doc.seoTitle,
+    seoDescription: doc.seoDescription,
+    seoKeywords: doc.seoKeywords,
+    ogTitle: doc.ogTitle,
+    ogDescription: doc.ogDescription,
+    ogImageId: doc.ogImageId,
+    noIndex: doc.noIndex,
   }));
 
   return (
@@ -80,6 +90,7 @@ export default async function AdminLegalPage({
         docs={drafts}
         role={user.role}
         canDelete={canDelete(user.role)}
+        media={media}
         saveAction={save}
         deleteAction={remove}
       />

@@ -10,8 +10,8 @@ import {
   TrendingUp,
   Users,
 } from "lucide-react";
-import type { Metadata } from "next";
 import Image from "next/image";
+import { metadataForEntry } from "@/lib/cms/seo";
 import Link from "next/link";
 import { JobBoard } from "@/components/job-board";
 import { PageIntro } from "@/components/page-intro";
@@ -19,11 +19,15 @@ import { getCareerPage, getJobs } from "@/lib/cms/jobs";
 import { images } from "@/lib/images";
 import { cn } from "@/lib/utils";
 
-export const metadata: Metadata = {
-  title: "Careers",
-  description:
-    "Work at SAF Food & Beverage Ltd. in Dhaka: open roles in sales, quality, production, logistics, marketing, and customer care.",
-};
+export async function generateMetadata() {
+  return metadataForEntry({
+    kind: "page",
+    slug: "careers",
+    fallbackTitle: "Careers",
+    fallbackDescription:
+      "Work at SAF Food & Beverage Ltd. in Dhaka: open roles in sales, quality, production, logistics, marketing, and customer care.",
+  });
+}
 
 const values = [
   { icon: Users, title: "Diversity", body: "Different perspectives. Stronger together." },

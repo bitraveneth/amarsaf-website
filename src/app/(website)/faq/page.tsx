@@ -1,6 +1,6 @@
 import { ArrowUpRight } from "lucide-react";
-import type { Metadata } from "next";
 import Link from "next/link";
+import { metadataForEntry } from "@/lib/cms/seo";
 import {
   Accordion,
   AccordionContent,
@@ -11,11 +11,15 @@ import { PageIntro } from "@/components/page-intro";
 import { getFaqs } from "@/lib/cms/faq";
 import { getSiteSettings } from "@/lib/cms/settings";
 
-export const metadata: Metadata = {
-  title: "FAQ",
-  description:
-    "Answers on SAF 8-stage purification, minerals, Dhaka delivery, returnable 18 L jars, certifications, and starting a supply.",
-};
+export async function generateMetadata() {
+  return metadataForEntry({
+    kind: "page",
+    slug: "faq",
+    fallbackTitle: "FAQ",
+    fallbackDescription:
+      "Answers on SAF 8-stage purification, minerals, Dhaka delivery, returnable 18 L jars, certifications, and starting a supply.",
+  });
+}
 
 export default async function FaqPage() {
   const [faqs, settings] = await Promise.all([getFaqs(), getSiteSettings()]);

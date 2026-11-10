@@ -10,6 +10,7 @@ import { MediaSelect } from "@/components/admin/media-select";
 import { PublishCheckbox } from "@/components/admin/publish-checkbox";
 import { FormMessage, FormSuccess } from "@/components/admin/form-message";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import { SeoFields } from "@/components/admin/seo-fields";
 
 export default async function AdminNewsPage({
   searchParams,
@@ -64,6 +65,12 @@ export default async function AdminNewsPage({
             <form action={save} className="space-y-4">
               <input type="hidden" name="id" value={post.id} />
               <NewsFields post={post} media={media} role={user.role} />
+              <SeoFields
+                media={media}
+                fallbackTitle={post.title}
+                fallbackDescription={post.body}
+                values={post}
+              />
               <Button type="submit" className="bg-violet-700 hover:bg-violet-800">
                 Save
               </Button>
@@ -75,6 +82,11 @@ export default async function AdminNewsPage({
       <form action={save} className="space-y-4 rounded-lg border border-dashed border-violet-300 bg-violet-50/40 p-6">
         <h2 className="font-medium">New post</h2>
         <NewsFields media={media} role={user.role} />
+        <SeoFields
+          media={media}
+          fallbackTitle="News story"
+          fallbackDescription="Notes from SAF."
+        />
         <Button type="submit" className="bg-violet-700 hover:bg-violet-800">
           Create post
         </Button>

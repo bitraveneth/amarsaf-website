@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/admin";
 import { prisma } from "@/lib/db";
-import { uploadMediaFile } from "@/lib/media-upload";
+import { removeLocalUpload, uploadMediaFile } from "@/lib/media-upload";
 import { revalidateSite } from "@/lib/revalidate";
 
 export async function POST(request: Request) {
@@ -17,9 +17,33 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Missing file" }, { status: 400 });
   }
 
-  const alt = String(formData.get("alt") ?? "").trim();
+  const replaceId = String(formData.get("id") ?? "").trim();
   const uploaded = await uploadMediaFile(file);
 
+  if (replaceId) {
+    const existing = await prisma.media.findUnique({ where: { id: replaceId } });
+    if (!existing) {
+      return NextResponse.json({ error: "Media not found" }, { status: 404 });
+    }
+
+    const media = await prisma.media.update({
+      where: { id: replaceId },
+      data: {
+        url: uploaded.url,
+        filename: uploaded.filename,
+        mimeType: uploaded.mimeType,
+        sizeBytes: uploaded.sizeBytes,
+        width: null,
+        height: null,
+      },
+    });
+
+    await removeLocalUpload(existing.url);
+    revalidateSite(["/", "/products", "/news", "/about", "/heritage", "/media-kit"]);
+    return NextResponse.json(media);
+  }
+
+  const alt = String(formData.get("alt") ?? "").trim();
   const media = await prisma.media.create({
     data: {
       url: uploaded.url,

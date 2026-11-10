@@ -14,7 +14,9 @@ import {
   Newspaper,
   Package,
   Scale,
+  Search,
   Settings,
+  Share2,
   Users,
   type LucideIcon,
 } from "lucide-react";
@@ -56,6 +58,8 @@ const GROUPS: NavGroup[] = [
     items: [
       { href: "/admin/legal", label: "Legal", icon: Scale },
       { href: "/admin/contact", label: "Contact", icon: Contact },
+      { href: "/admin/socials", label: "Socials", icon: Share2, adminOnly: true },
+      { href: "/admin/seo", label: "SEO", icon: Search, adminOnly: true },
       { href: "/admin/settings", label: "Settings", icon: Settings, adminOnly: true },
     ],
   },

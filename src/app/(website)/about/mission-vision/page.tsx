@@ -12,18 +12,22 @@ import {
   Target,
   Truck,
 } from "lucide-react";
-import type { Metadata } from "next";
+import { metadataForEntry } from "@/lib/cms/seo";
 import { AboutExplore } from "@/components/about-explore";
 import { AboutNav } from "@/components/about-nav";
 import { PageIntro } from "@/components/page-intro";
 import { images } from "@/lib/images";
 import { cn } from "@/lib/utils";
 
-export const metadata: Metadata = {
-  title: "Mission & Vision",
-  description:
-    "SAF's mission, vision, goals, and core values: pure, nutritious, and reliable food and beverages that consumers trust.",
-};
+export async function generateMetadata() {
+  return metadataForEntry({
+    kind: "page",
+    slug: "about/mission-vision",
+    fallbackTitle: "Mission & Vision",
+    fallbackDescription:
+      "SAF's mission, vision, goals, and core values: pure, nutritious, and reliable food and beverages that consumers trust.",
+  });
+}
 
 const goals = [
   {

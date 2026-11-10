@@ -1,7 +1,12 @@
 import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db";
 import { CMS_TAG } from "@/lib/revalidate";
-import { company as staticCompany, nav as staticNav, socials as staticSocials } from "@/lib/site";
+import {
+  certifications as staticCertifications,
+  company as staticCompany,
+  nav as staticNav,
+  socials as staticSocials,
+} from "@/lib/site";
 
 async function loadSettings() {
   const [settings, nav, socials] = await Promise.all([
@@ -33,6 +38,13 @@ async function loadSettings() {
           seoTitle: null as string | null,
           seoDescription: null as string | null,
         },
+    headerBar: {
+      delivery:
+        settings?.headerDelivery?.trim() || "Home and office delivery across Dhaka",
+      cert: settings?.headerCert?.trim() || "BSTI & ISO 22000 certified",
+      hotline: settings?.hotline?.trim() || staticCompany.hotline,
+      email: settings?.email?.trim() || staticCompany.email,
+    },
     notice: settings
       ? {
           enabled: settings.noticeEnabled,
@@ -40,6 +52,15 @@ async function loadSettings() {
           href: settings.noticeHref,
         }
       : { enabled: false, text: null as string | null, href: null as string | null },
+    footer: {
+      copyright:
+        settings?.footerCopyright?.trim() ||
+        `© ${new Date().getFullYear()} ${settings?.companyName ?? staticCompany.name}`,
+      certifications:
+        settings?.footerCertifications && settings.footerCertifications.length > 0
+          ? settings.footerCertifications
+          : [...staticCertifications],
+    },
     nav:
       nav.length > 0
         ? nav.map((n) => ({ href: n.href, label: n.label }))

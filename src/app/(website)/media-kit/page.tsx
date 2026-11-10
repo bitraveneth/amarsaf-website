@@ -1,6 +1,6 @@
 import { ArrowRight, Download, FileText, Package, Type, X } from "lucide-react";
-import type { Metadata } from "next";
 import Image from "next/image";
+import { metadataForEntry } from "@/lib/cms/seo";
 import Link from "next/link";
 import type { CSSProperties } from "react";
 import { ColorSwatch } from "@/components/color-swatch";
@@ -16,11 +16,15 @@ import {
 } from "@/lib/media-kit";
 import { cn } from "@/lib/utils";
 
-export const metadata: Metadata = {
-  title: "Media Kit",
-  description:
-    "Download SAF logos, colours, typography, patterns, and the brand guidelines for press, retail, and partner use.",
-};
+export async function generateMetadata() {
+  return metadataForEntry({
+    kind: "page",
+    slug: "media-kit",
+    fallbackTitle: "Media Kit",
+    fallbackDescription:
+      "Download SAF logos, colours, typography, patterns, and the brand guidelines for press, retail, and partner use.",
+  });
+}
 
 const sections = [
   { id: "logos", label: "Logos" },

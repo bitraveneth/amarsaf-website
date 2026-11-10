@@ -6,6 +6,7 @@ import {
   Check,
   Copy,
   ImageIcon,
+  RefreshCw,
   Search,
   Trash2,
   Upload,
@@ -46,21 +47,30 @@ function formatDate(iso: string) {
 
 export function MediaLibrary({
   media,
+  initialSelectedId,
   canDelete,
   uploadAction,
   saveAltAction,
+  replaceAction,
   deleteAction,
 }: {
   media: MediaItem[];
+  initialSelectedId?: string | null;
   canDelete: boolean;
   uploadAction: (formData: FormData) => Promise<void>;
   saveAltAction: (formData: FormData) => Promise<void>;
+  replaceAction: (formData: FormData) => Promise<void>;
   deleteAction: (formData: FormData) => Promise<void>;
 }) {
-  const [selectedId, setSelectedId] = useState<string | null>(media[0]?.id ?? null);
+  const [selectedId, setSelectedId] = useState<string | null>(
+    initialSelectedId && media.some((m) => m.id === initialSelectedId)
+      ? initialSelectedId
+      : (media[0]?.id ?? null),
+  );
   const [query, setQuery] = useState("");
   const [copied, setCopied] = useState(false);
   const [pending, startTransition] = useTransition();
+  const [replacing, setReplacing] = useState(false);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -247,6 +257,53 @@ export function MediaLibrary({
                   />
                 </div>
 
+                <form
+                  action={replaceAction}
+                  encType="multipart/form-data"
+                  className="rounded-xl border border-dashed border-[var(--admin-border-strong)] bg-white p-3"
+                  onSubmit={() => {
+                    setReplacing(true);
+                    startTransition(() => undefined);
+                  }}
+                >
+                  <input type="hidden" name="id" value={selected.id} />
+                  <div className="flex items-start gap-3">
+                    <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg bg-violet-100 text-violet-700">
+                      <RefreshCw className={cn("size-4", replacing && pending && "animate-spin")} />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-semibold text-[var(--admin-text)]">
+                        Replace image
+                      </p>
+                      <p className="mt-0.5 text-xs text-[var(--admin-muted)]">
+                        Same library item — hero, products, and pages that use it update automatically.
+                      </p>
+                      <label className="mt-3 flex cursor-pointer flex-col gap-2">
+                        <span className="sr-only">Choose replacement file</span>
+                        <input
+                          name="file"
+                          type="file"
+                          accept="image/*"
+                          required
+                          disabled={pending}
+                          className="!min-h-0 text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-violet-50 file:px-3 file:py-2 file:text-xs file:font-semibold file:text-violet-800 hover:file:bg-violet-100"
+                          onChange={(e) => {
+                            const form = e.currentTarget.form;
+                            if (form && e.currentTarget.files?.length) {
+                              form.requestSubmit();
+                            }
+                          }}
+                        />
+                      </label>
+                      {replacing && pending ? (
+                        <p className="mt-2 text-xs font-medium text-violet-700">
+                          Replacing…
+                        </p>
+                      ) : null}
+                    </div>
+                  </div>
+                </form>
+
                 <dl className="grid gap-2 text-sm">
                   <div className="flex justify-between gap-3">
                     <dt className="text-[var(--admin-muted)]">Uploaded</dt>
@@ -331,7 +388,7 @@ export function MediaLibrary({
                 <ImageIcon className="size-8 text-[var(--admin-faint)]" />
                 <p className="mt-3 text-sm font-semibold">Select an item</p>
                 <p className="mt-1 text-xs text-[var(--admin-muted)]">
-                  Click a thumbnail to edit alt text or copy the URL.
+                  Click a thumbnail to replace the file, edit alt text, or copy the URL.
                 </p>
               </div>
             )}

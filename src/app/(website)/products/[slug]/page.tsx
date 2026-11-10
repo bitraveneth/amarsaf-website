@@ -7,6 +7,7 @@ import { ProductCard } from "@/components/product-card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { resolveIcon } from "@/lib/cms/icons";
 import { getProduct, getProducts } from "@/lib/cms/products";
+import { metadataForEntry } from "@/lib/cms/seo";
 import { productImages, productLifestyle } from "@/lib/images";
 import { certifications, minerals, stages } from "@/lib/site";
 import { cn } from "@/lib/utils";
@@ -23,11 +24,16 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const product = await getProduct(slug);
-  if (!product) return {};
-  return {
-    title: `${product.name} ${product.size}`,
-    description: `${product.name} ${product.size}: ${product.description ?? product.summary}`,
-  };
+  const fallbackTitle = product ? `${product.name} ${product.size}` : "Product";
+  const fallbackDescription = product
+    ? `${product.name} ${product.size}: ${product.description ?? product.summary}`
+    : "SAF packaged drinking water.";
+  return metadataForEntry({
+    kind: "product",
+    slug,
+    fallbackTitle,
+    fallbackDescription,
+  });
 }
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {

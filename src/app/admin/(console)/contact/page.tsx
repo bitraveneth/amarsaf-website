@@ -84,18 +84,33 @@ export default async function AdminContactPage({
     <div>
       <AdminPageHeader
         title="Contact form"
-        description="Controls the enquiry cards and dropdown options on /contact — not a mailbox. Messages still go through the public form."
+        description="Controls the enquiry cards and dropdown options on /contact. Live messages are emailed via Resend."
         breadcrumbs={[{ label: "Site" }, { label: "Contact" }]}
       />
       <FormSuccess message={params.saved ? "Contact settings saved." : null} />
       <FormMessage message={params.error} />
 
-      <div className="mb-6 rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-950">
-        <p className="font-semibold">What is this page?</p>
-        <p className="mt-1 text-sky-900/80">
-          It edits the labels visitors see when they contact SAF (Product / Business / Support /
-          Careers). It does not receive emails — that stays on the public contact form.
-        </p>
+      <div className="mb-6 space-y-3">
+        <div className="rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-950">
+          <p className="font-semibold">What is this page?</p>
+          <p className="mt-1 text-sky-900/80">
+            It edits the labels visitors see when they contact SAF (Product / Business / Support /
+            Careers). Enquiries from the public form are emailed to your inbox — they are not stored
+            here.
+          </p>
+        </div>
+        <div className="rounded-xl border border-violet-200 bg-violet-50 px-4 py-3 text-sm text-violet-950">
+          <p className="font-semibold">Email delivery (Resend)</p>
+          <p className="mt-1 text-violet-900/80">
+            Set <code className="rounded bg-white/80 px-1 font-mono text-[12px]">RESEND_API_KEY</code>{" "}
+            and{" "}
+            <code className="rounded bg-white/80 px-1 font-mono text-[12px]">CONTACT_FROM_EMAIL</code>{" "}
+            in the host environment (local <code className="font-mono text-[12px]">.env</code> and
+            Vercel). Inbox defaults to Site → Settings email; override with{" "}
+            <code className="rounded bg-white/80 px-1 font-mono text-[12px]">CONTACT_TO_EMAIL</code>{" "}
+            if needed. The from address must use a domain verified in Resend.
+          </p>
+        </div>
       </div>
 
       <form action={save} className="space-y-6">

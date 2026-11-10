@@ -5,7 +5,6 @@ import { SocialIcon } from "@/components/social-icon";
 import { getLegalDocs } from "@/lib/cms/legal";
 import { getProducts } from "@/lib/cms/products";
 import { getSiteSettings } from "@/lib/cms/settings";
-import { certifications, type SocialId } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 export async function SiteFooter() {
@@ -14,7 +13,8 @@ export async function SiteFooter() {
     getProducts(),
     getLegalDocs(),
   ]);
-  const { company, socials } = settings;
+  const { company, socials, footer } = settings;
+  const { copyright, certifications } = footer;
 
   const columns = [
     {
@@ -121,7 +121,7 @@ export async function SiteFooter() {
                         aria-label={`SAF on ${social.label} (opens in a new tab)`}
                         className="flex size-11 items-center justify-center rounded-full bg-white/[0.07] text-white/85 ring-1 ring-white/15 transition-colors hover:bg-white hover:text-purple"
                       >
-                        <SocialIcon id={social.id as SocialId} className="size-[1.125rem]" />
+                        <SocialIcon id={social.id} className="size-[1.125rem]" />
                       </a>
                     </li>
                   ))}
@@ -163,7 +163,7 @@ export async function SiteFooter() {
           </p>
 
           <div className="mt-8 flex flex-col gap-5 border-t border-white/10 py-6 text-xs text-white/60 md:flex-row md:items-center md:justify-between">
-            <p>© 2026 {company.name}</p>
+            <p>{copyright}</p>
             <ul aria-label="Certifications" className="flex flex-wrap gap-2">
               {certifications.map((item) => (
                 <li

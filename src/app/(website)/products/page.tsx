@@ -1,17 +1,21 @@
 import { ArrowRight, ArrowUpRight } from "lucide-react";
-import type { Metadata } from "next";
 import Image from "next/image";
+import { metadataForEntry } from "@/lib/cms/seo";
 import Link from "next/link";
 import { PageIntro } from "@/components/page-intro";
 import { ProductCard } from "@/components/product-card";
 import { getProducts } from "@/lib/cms/products";
 import { productImages } from "@/lib/images";
 
-export const metadata: Metadata = {
-  title: "Products",
-  description:
-    "SAF Daily 500 ml, Executive 1 L, Family 2 L, and Commercial 18 L returnable jars for home and office.",
-};
+export async function generateMetadata() {
+  return metadataForEntry({
+    kind: "page",
+    slug: "products",
+    fallbackTitle: "Products",
+    fallbackDescription:
+      "SAF Daily 500 ml, Executive 1 L, Family 2 L, and Commercial 18 L returnable jars for home and office.",
+  });
+}
 
 export default async function ProductsPage() {
   const products = await getProducts();

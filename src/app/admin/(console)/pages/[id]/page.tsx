@@ -4,6 +4,7 @@ import { requireAdmin, canDelete } from "@/lib/admin";
 import { prisma } from "@/lib/db";
 import {
   deleteSectionBlock,
+  updatePageSeo,
   upsertSection,
   upsertSectionBlock,
 } from "@/lib/admin-actions";
@@ -11,6 +12,7 @@ import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { MediaPicker } from "@/components/admin/media-picker";
 import { PublishCheckbox } from "@/components/admin/publish-checkbox";
 import { FormMessage, FormSuccess } from "@/components/admin/form-message";
+import { SeoFields } from "@/components/admin/seo-fields";
 
 export default async function AdminPageSectionsPage({
   params,
@@ -101,6 +103,29 @@ export default async function AdminPageSectionsPage({
       />
       <FormSuccess message={sp.saved ? "Saved." : null} />
       <FormMessage message={sp.error} />
+
+      <form
+        action={async (formData) => {
+          "use server";
+          formData.set("id", pageId);
+          const result = await updatePageSeo(formData);
+          if (!result.ok) {
+            redirect(`/admin/pages/${pageId}?error=${encodeURIComponent(result.error)}`);
+          }
+          redirect(`/admin/pages/${pageId}?saved=1`);
+        }}
+        className="mb-6 max-w-3xl space-y-4"
+      >
+        <SeoFields
+          media={media}
+          fallbackTitle={page.title}
+          fallbackDescription={page.seoDescription || page.title}
+          values={page}
+        />
+        <button type="submit" className="admin-btn-primary">
+          Save search appearance
+        </button>
+      </form>
 
       <div className="grid gap-6 lg:grid-cols-[18rem_minmax(0,1fr)]">
         <aside className="admin-panel h-fit overflow-hidden lg:sticky lg:top-20">

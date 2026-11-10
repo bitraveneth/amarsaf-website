@@ -1,6 +1,6 @@
 import { ArrowRight, BriefcaseBusiness, CircleHelp, MapPin, Palette, Phone } from "lucide-react";
-import type { Metadata } from "next";
 import Link from "next/link";
+import { metadataForEntry } from "@/lib/cms/seo";
 import { ContactForm } from "@/components/contact-form";
 import { PageIntro } from "@/components/page-intro";
 import { SocialIcon } from "@/components/social-icon";
@@ -8,13 +8,15 @@ import { enquiryTypes, isEnquiryType } from "@/lib/contact";
 import { getContactSettings } from "@/lib/cms/contact";
 import { getSiteSettings } from "@/lib/cms/settings";
 import { images } from "@/lib/images";
-import type { SocialId } from "@/lib/site";
-
-export const metadata: Metadata = {
-  title: "Contact",
-  description:
-    "Contact SAF Food & Beverage Ltd. in Bashundhara, Dhaka: product enquiries, business and distribution, customer support, and careers.",
-};
+export async function generateMetadata() {
+  return metadataForEntry({
+    kind: "page",
+    slug: "contact",
+    fallbackTitle: "Contact",
+    fallbackDescription:
+      "Contact SAF Food & Beverage Ltd. in Bashundhara, Dhaka: product enquiries, business and distribution, customer support, and careers.",
+  });
+}
 
 const moreHelp = [
   { href: "/faq", label: "FAQ", body: "Quick answers on delivery, jars, and minerals.", icon: CircleHelp },
@@ -117,7 +119,7 @@ export default async function ContactPage({
                     aria-label={`SAF on ${social.label} (opens in a new tab)`}
                     className="flex size-11 items-center justify-center rounded-full bg-white text-ink/75 ring-1 ring-ink/10 transition-colors hover:bg-purple hover:text-white hover:ring-purple"
                   >
-                    <SocialIcon id={social.id as SocialId} className="size-[1.125rem]" />
+                    <SocialIcon id={social.id} className="size-[1.125rem]" />
                   </a>
                 </li>
               ))}

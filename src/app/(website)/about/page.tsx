@@ -10,8 +10,8 @@ import {
   Store,
   Truck,
 } from "lucide-react";
-import type { Metadata } from "next";
 import Image from "next/image";
+import { metadataForEntry } from "@/lib/cms/seo";
 import Link from "next/link";
 import { AboutNav } from "@/components/about-nav";
 import { PageIntro } from "@/components/page-intro";
@@ -19,11 +19,15 @@ import { aboutPages } from "@/lib/about";
 import { images } from "@/lib/images";
 import { leader } from "@/lib/site";
 
-export const metadata: Metadata = {
-  title: "About Us",
-  description:
-    "SAF is a Bangladeshi food and beverage brand. We bottle laboratory-verified, mineral-balanced drinking water in Bashundhara, Dhaka.",
-};
+export async function generateMetadata() {
+  return metadataForEntry({
+    kind: "page",
+    slug: "about",
+    fallbackTitle: "About Us",
+    fallbackDescription:
+      "SAF is a Bangladeshi food and beverage brand. We bottle laboratory-verified, mineral-balanced drinking water in Bashundhara, Dhaka.",
+  });
+}
 
 // Plant and product figures are confirmed; capacity and reach figures are placeholders until SAF supplies real numbers.
 const glance = [

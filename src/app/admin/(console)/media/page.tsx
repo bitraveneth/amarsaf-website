@@ -1,7 +1,12 @@
 import { redirect } from "next/navigation";
 import { requireAdmin, canDelete } from "@/lib/admin";
 import { prisma } from "@/lib/db";
-import { createMedia, deleteMedia, updateMediaAlt } from "@/lib/admin-actions";
+import {
+  createMedia,
+  deleteMedia,
+  replaceMedia,
+  updateMediaAlt,
+} from "@/lib/admin-actions";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { FormMessage, FormSuccess } from "@/components/admin/form-message";
 import { MediaLibrary } from "@/components/admin/media-library";
@@ -9,7 +14,7 @@ import { MediaLibrary } from "@/components/admin/media-library";
 export default async function AdminMediaPage({
   searchParams,
 }: {
-  searchParams: Promise<{ saved?: string; error?: string }>;
+  searchParams: Promise<{ saved?: string; error?: string; selected?: string }>;
 }) {
   const user = await requireAdmin();
   const media = await prisma.media.findMany({ orderBy: { createdAt: "desc" } });
@@ -24,9 +29,18 @@ export default async function AdminMediaPage({
 
   async function saveAlt(formData: FormData) {
     "use server";
+    const id = String(formData.get("id") ?? "");
     const result = await updateMediaAlt(formData);
     if (!result.ok) redirect(`/admin/media?error=${encodeURIComponent(result.error)}`);
-    redirect("/admin/media?saved=1");
+    redirect(`/admin/media?saved=1&selected=${encodeURIComponent(id)}`);
+  }
+
+  async function replace(formData: FormData) {
+    "use server";
+    const id = String(formData.get("id") ?? "");
+    const result = await replaceMedia(formData);
+    if (!result.ok) redirect(`/admin/media?error=${encodeURIComponent(result.error)}`);
+    redirect(`/admin/media?saved=1&selected=${encodeURIComponent(id)}`);
   }
 
   async function remove(formData: FormData) {
@@ -40,7 +54,7 @@ export default async function AdminMediaPage({
     <div>
       <AdminPageHeader
         title="Media library"
-        description="WordPress-style gallery — select a thumbnail to edit details, copy the URL, or delete."
+        description="Upload new images, or select one to replace the file in place — every page using that image updates automatically."
         breadcrumbs={[{ label: "Content" }, { label: "Media" }]}
       />
       <FormSuccess message={params.saved ? "Media library updated." : null} />
@@ -58,9 +72,11 @@ export default async function AdminMediaPage({
           sizeBytes: m.sizeBytes,
           createdAt: m.createdAt.toISOString(),
         }))}
+        initialSelectedId={params.selected ?? null}
         canDelete={canDelete(user.role)}
         uploadAction={upload}
         saveAltAction={saveAlt}
+        replaceAction={replace}
         deleteAction={remove}
       />
     </div>

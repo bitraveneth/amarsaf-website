@@ -1,5 +1,5 @@
-import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
+import { rootMetadata } from "@/lib/cms/seo";
 import "./globals.css";
 
 const jakarta = Plus_Jakarta_Sans({
@@ -9,14 +9,9 @@ const jakarta = Plus_Jakarta_Sans({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  title: {
-    default: "SAF Packaged Drinking Water | Simply Pure Hydration Bangladesh",
-    template: "%s | SAF Water",
-  },
-  description:
-    "Order SAF packaged drinking water online. 8-stage purified water with essential minerals for home and office delivery across Dhaka.",
-};
+export async function generateMetadata() {
+  return rootMetadata();
+}
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

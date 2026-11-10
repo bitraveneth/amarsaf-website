@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PageIntro } from "@/components/page-intro";
 import { getLegalDoc, getLegalDocs, getLegalUpdated } from "@/lib/cms/legal";
+import { metadataForEntry } from "@/lib/cms/seo";
 import { cn } from "@/lib/utils";
 
 export async function generateStaticParams() {
@@ -18,7 +19,12 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const doc = await getLegalDoc(slug);
-  return doc ? { title: doc.title, description: doc.description } : {};
+  return metadataForEntry({
+    kind: "legal",
+    slug,
+    fallbackTitle: doc?.title ?? "Legal",
+    fallbackDescription: doc?.description ?? "SAF legal information.",
+  });
 }
 
 export default async function LegalPage({ params }: { params: Promise<{ slug: string }> }) {

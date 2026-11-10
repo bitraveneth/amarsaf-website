@@ -14,7 +14,7 @@ import {
   requireRole,
 } from "@/lib/admin";
 import { prisma } from "@/lib/db";
-import { uploadMediaFile } from "@/lib/media-upload";
+import { removeLocalUpload, uploadMediaFile } from "@/lib/media-upload";
 import { revalidateSite } from "@/lib/revalidate";
 import type { Role } from "@/lib/roles";
 
@@ -62,6 +62,18 @@ function ok(): ActionResult {
   return { ok: true };
 }
 
+function seoFromForm(formData: FormData) {
+  return {
+    seoTitle: optStr(formData, "seoTitle"),
+    seoDescription: optStr(formData, "seoDescription"),
+    seoKeywords: optStr(formData, "seoKeywords"),
+    ogTitle: optStr(formData, "ogTitle"),
+    ogDescription: optStr(formData, "ogDescription"),
+    ogImageId: optStr(formData, "ogImageId"),
+    noIndex: bool(formData, "noIndex"),
+  };
+}
+
 export async function adminSignIn(formData: FormData): Promise<ActionResult> {
   const email = str(formData, "email").toLowerCase();
   const password = str(formData, "password");
@@ -96,6 +108,9 @@ export async function updateSettings(formData: FormData): Promise<ActionResult> 
   }
 
   const addressLines = linesFromTextarea(str(formData, "addressLines"));
+  const footerCertifications = linesFromTextarea(str(formData, "footerCertifications"));
+  const footerCopyright =
+    optStr(formData, "footerCopyright") || "© 2026 SAF Food & Beverage Ltd.";
 
   await prisma.siteSettings.upsert({
     where: { id: 1 },
@@ -106,8 +121,11 @@ export async function updateSettings(formData: FormData): Promise<ActionResult> 
       addressLines,
       hotline: str(formData, "hotline"),
       email: str(formData, "email"),
-      seoTitle: optStr(formData, "seoTitle"),
-      seoDescription: optStr(formData, "seoDescription"),
+      headerDelivery:
+        optStr(formData, "headerDelivery") || "Home and office delivery across Dhaka",
+      headerCert: optStr(formData, "headerCert") || "BSTI & ISO 22000 certified",
+      footerCopyright,
+      footerCertifications,
       noticeEnabled: bool(formData, "noticeEnabled"),
       noticeText: optStr(formData, "noticeText"),
       noticeHref: optStr(formData, "noticeHref"),
@@ -118,16 +136,142 @@ export async function updateSettings(formData: FormData): Promise<ActionResult> 
       addressLines,
       hotline: str(formData, "hotline"),
       email: str(formData, "email"),
-      seoTitle: optStr(formData, "seoTitle"),
-      seoDescription: optStr(formData, "seoDescription"),
+      headerDelivery:
+        optStr(formData, "headerDelivery") || "Home and office delivery across Dhaka",
+      headerCert: optStr(formData, "headerCert") || "BSTI & ISO 22000 certified",
+      footerCopyright,
+      footerCertifications,
       noticeEnabled: bool(formData, "noticeEnabled"),
       noticeText: optStr(formData, "noticeText"),
       noticeHref: optStr(formData, "noticeHref"),
     },
   });
 
-  revalidateSite(["/", "/about"]);
+  revalidateSite(["/", "/about", "/contact"]);
   revalidatePath("/admin/settings");
+  return ok();
+}
+
+function slugifySocialKey(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 40);
+}
+
+export async function upsertSocial(formData: FormData): Promise<ActionResult> {
+  let user;
+  try {
+    user = await requireRole(canEditSettings);
+  } catch {
+    return fail("You do not have permission to edit social links.");
+  }
+
+  const id = optStr(formData, "id");
+  const label = str(formData, "label");
+  const href = str(formData, "href");
+  if (!label || !href) return fail("Label and URL are required.");
+
+  const key =
+    slugifySocialKey(str(formData, "key") || label) ||
+    `social-${Date.now().toString(36)}`;
+
+  const data = {
+    key,
+    label,
+    href,
+    order: int(formData, "order"),
+    isPublished: publishedForRole(user.role, bool(formData, "isPublished")),
+  };
+
+  if (id) {
+    await prisma.socialLink.update({ where: { id }, data });
+  } else {
+    const existing = await prisma.socialLink.findUnique({ where: { key } });
+    if (existing) return fail(`A social link with key “${key}” already exists.`);
+    await prisma.socialLink.create({ data });
+  }
+
+  revalidateSite(["/", "/contact"]);
+  revalidatePath("/admin/socials");
+  return ok();
+}
+
+export async function deleteSocial(formData: FormData): Promise<ActionResult> {
+  try {
+    await requireRole(canEditSettings);
+  } catch {
+    return fail("You do not have permission to delete social links.");
+  }
+
+  const id = str(formData, "id");
+  if (!id) return fail("Missing id.");
+
+  await prisma.socialLink.delete({ where: { id } });
+  revalidateSite(["/", "/contact"]);
+  revalidatePath("/admin/socials");
+  return ok();
+}
+
+export async function updateSiteSeo(formData: FormData): Promise<ActionResult> {
+  try {
+    await requireRole(canEditSettings);
+  } catch {
+    return fail("You do not have permission to edit SEO settings.");
+  }
+
+  const seo = {
+    seoTitle: optStr(formData, "seoTitle"),
+    seoDescription: optStr(formData, "seoDescription"),
+    seoKeywords: optStr(formData, "seoKeywords"),
+    titleTemplate: optStr(formData, "titleTemplate") || "%s | SAF Water",
+    ogImageId: optStr(formData, "ogImageId"),
+    allowIndexing: bool(formData, "allowIndexing"),
+  };
+
+  await prisma.siteSettings.upsert({
+    where: { id: 1 },
+    create: {
+      id: 1,
+      companyName: "SAF",
+      tagline: "",
+      addressLines: [],
+      hotline: "",
+      email: "",
+      ...seo,
+    },
+    update: seo,
+  });
+
+  revalidateSite(["/"]);
+  revalidatePath("/admin/seo");
+  revalidatePath("/sitemap.xml");
+  revalidatePath("/robots.txt");
+  return ok();
+}
+
+export async function updatePageSeo(formData: FormData): Promise<ActionResult> {
+  try {
+    await requireAdmin();
+  } catch {
+    return fail("Unauthorized.");
+  }
+
+  const id = str(formData, "id");
+  if (!id) return fail("Missing page.");
+
+  await prisma.page.update({
+    where: { id },
+    data: seoFromForm(formData),
+  });
+
+  const page = await prisma.page.findUnique({ where: { id } });
+  const path = !page || page.slug === "home" ? "/" : `/${page.slug}`;
+  revalidateSite([path]);
+  revalidatePath(`/admin/pages/${id}`);
+  revalidatePath("/sitemap.xml");
   return ok();
 }
 
@@ -181,6 +325,45 @@ export async function updateMediaAlt(formData: FormData): Promise<ActionResult> 
   return ok();
 }
 
+export async function replaceMedia(formData: FormData): Promise<ActionResult> {
+  try {
+    await requireAdmin();
+  } catch {
+    return fail("Unauthorized.");
+  }
+
+  const id = str(formData, "id");
+  if (!id) return fail("Missing media id.");
+
+  const file = formData.get("file");
+  if (!(file instanceof File) || file.size === 0) {
+    return fail("Choose a file to replace with.");
+  }
+
+  const existing = await prisma.media.findUnique({ where: { id } });
+  if (!existing) return fail("Media not found.");
+
+  const uploaded = await uploadMediaFile(file);
+
+  await prisma.media.update({
+    where: { id },
+    data: {
+      url: uploaded.url,
+      filename: uploaded.filename,
+      mimeType: uploaded.mimeType,
+      sizeBytes: uploaded.sizeBytes,
+      width: null,
+      height: null,
+    },
+  });
+
+  await removeLocalUpload(existing.url);
+
+  revalidateSite(["/", "/products", "/news", "/about", "/heritage", "/media-kit"]);
+  revalidatePath("/admin/media");
+  return ok();
+}
+
 export async function deleteMedia(formData: FormData): Promise<ActionResult> {
   let user;
   try {
@@ -193,7 +376,10 @@ export async function deleteMedia(formData: FormData): Promise<ActionResult> {
   const id = str(formData, "id");
   if (!id) return fail("Missing media id.");
 
+  const existing = await prisma.media.findUnique({ where: { id } });
   await prisma.media.delete({ where: { id } });
+  if (existing) await removeLocalUpload(existing.url);
+
   revalidateSite(["/", "/products", "/news"]);
   revalidatePath("/admin/media");
   return ok();
@@ -288,6 +474,7 @@ export async function upsertProduct(formData: FormData): Promise<ActionResult> {
     description: optStr(formData, "description"),
     order: int(formData, "order"),
     isPublished: publishedForRole(user.role, bool(formData, "isPublished")),
+    ...seoFromForm(formData),
     packMediaId: optStr(formData, "packMediaId"),
     lifeMediaId: optStr(formData, "lifeMediaId"),
     ...(idealForJson.trim()
@@ -409,6 +596,7 @@ export async function upsertNews(formData: FormData): Promise<ActionResult> {
     order: int(formData, "order"),
     isPublished: publishedForRole(user.role, bool(formData, "isPublished")),
     mediaId: optStr(formData, "mediaId"),
+    ...seoFromForm(formData),
   };
 
   if (id) {
@@ -695,6 +883,7 @@ export async function upsertLegal(formData: FormData): Promise<ActionResult> {
     updatedIso: optStr(formData, "updatedIso"),
     order: int(formData, "order"),
     isPublished: publishedForRole(user.role, bool(formData, "isPublished")),
+    ...seoFromForm(formData),
   };
 
   if (id) {

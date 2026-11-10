@@ -3,8 +3,11 @@ import { BackToTop } from "@/components/back-to-top";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { SiteNotice } from "@/components/site-notice";
+import { getSiteSettings } from "@/lib/cms/settings";
 
-export default function WebsiteLayout({ children }: { children: React.ReactNode }) {
+export default async function WebsiteLayout({ children }: { children: React.ReactNode }) {
+  const { headerBar } = await getSiteSettings();
+
   return (
     <>
       <a
@@ -14,7 +17,7 @@ export default function WebsiteLayout({ children }: { children: React.ReactNode 
         Skip to content
       </a>
       <SiteNotice />
-      <SiteHeader />
+      <SiteHeader headerBar={headerBar} />
       <main id="content" tabIndex={-1} className="flex-1 outline-none">
         {children}
       </main>

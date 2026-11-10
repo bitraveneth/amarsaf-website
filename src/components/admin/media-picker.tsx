@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useRef, useState, useTransition } from "react";
-import { ImageIcon, Loader2, Upload } from "lucide-react";
+import { ImageIcon, Loader2, RefreshCw, Upload } from "lucide-react";
 
 type MediaItem = {
   id: string;
@@ -26,27 +26,42 @@ export function MediaPicker({
   const [selectedId, setSelectedId] = useState(defaultValue ?? "");
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const [mode, setMode] = useState<"idle" | "upload" | "replace">("idle");
   const fileRef = useRef<HTMLInputElement>(null);
+  const replaceRef = useRef<HTMLInputElement>(null);
 
   const selected = items.find((m) => m.id === selectedId) ?? null;
 
-  function onUpload(file: File | undefined) {
+  function onUpload(file: File | undefined, replaceId?: string) {
     if (!file) return;
     setError(null);
+    setMode(replaceId ? "replace" : "upload");
     startTransition(async () => {
       const body = new FormData();
       body.set("file", file);
-      body.set("alt", file.name.replace(/\.[^.]+$/, "").replace(/[-_]/g, " "));
+      if (replaceId) {
+        body.set("id", replaceId);
+      } else {
+        body.set("alt", file.name.replace(/\.[^.]+$/, "").replace(/[-_]/g, " "));
+      }
       const res = await fetch("/api/admin/media", { method: "POST", body });
       if (!res.ok) {
         const data = (await res.json().catch(() => null)) as { error?: string } | null;
-        setError(data?.error || "Upload failed");
+        setError(data?.error || (replaceId ? "Replace failed" : "Upload failed"));
+        setMode("idle");
         return;
       }
-      const created = (await res.json()) as MediaItem;
-      setItems((prev) => [created, ...prev]);
-      setSelectedId(created.id);
+      const result = (await res.json()) as MediaItem;
+      if (replaceId) {
+        setItems((prev) => prev.map((m) => (m.id === replaceId ? { ...m, ...result } : m)));
+        setSelectedId(replaceId);
+      } else {
+        setItems((prev) => [result, ...prev]);
+        setSelectedId(result.id);
+      }
       if (fileRef.current) fileRef.current.value = "";
+      if (replaceRef.current) replaceRef.current.value = "";
+      setMode("idle");
     });
   }
 
@@ -59,6 +74,7 @@ export function MediaPicker({
         <div className="relative aspect-[16/9] w-full bg-slate-100">
           {selected?.url ? (
             <Image
+              key={selected.url}
               src={selected.url}
               alt={selected.alt || ""}
               fill
@@ -91,8 +107,43 @@ export function MediaPicker({
             </select>
           </div>
 
+          {selectedId ? (
+            <div>
+              <label className="!text-[11px]">Replace this image</label>
+              <p className="mb-2 text-[11px] text-[var(--admin-muted)]">
+                Keeps the same media item — every place using it gets the new file.
+              </p>
+              <div className="flex flex-wrap items-center gap-2">
+                <input
+                  ref={replaceRef}
+                  type="file"
+                  accept="image/*"
+                  disabled={pending}
+                  onChange={(e) => onUpload(e.target.files?.[0], selectedId)}
+                  className="!min-h-0 flex-1 text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-amber-50 file:px-3 file:py-2 file:text-xs file:font-semibold file:text-amber-900 hover:file:bg-amber-100"
+                />
+                <button
+                  type="button"
+                  data-variant="outline"
+                  disabled={pending}
+                  onClick={() => replaceRef.current?.click()}
+                  className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-[var(--admin-border-strong)] bg-white px-3 text-xs font-semibold hover:bg-slate-50 disabled:opacity-60"
+                >
+                  {pending && mode === "replace" ? (
+                    <Loader2 className="size-3.5 animate-spin" />
+                  ) : (
+                    <RefreshCw className="size-3.5" />
+                  )}
+                  {pending && mode === "replace" ? "Replacing…" : "Replace"}
+                </button>
+              </div>
+            </div>
+          ) : null}
+
           <div>
-            <label className="!text-[11px]">Or upload a new image</label>
+            <label className="!text-[11px]">
+              {selectedId ? "Or upload as a new library item" : "Or upload a new image"}
+            </label>
             <div className="flex flex-wrap items-center gap-2">
               <input
                 ref={fileRef}
@@ -109,16 +160,17 @@ export function MediaPicker({
                 onClick={() => fileRef.current?.click()}
                 className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-[var(--admin-border-strong)] bg-white px-3 text-xs font-semibold hover:bg-slate-50 disabled:opacity-60"
               >
-                {pending ? (
+                {pending && mode === "upload" ? (
                   <Loader2 className="size-3.5 animate-spin" />
                 ) : (
                   <Upload className="size-3.5" />
                 )}
-                {pending ? "Uploading…" : "Browse"}
+                {pending && mode === "upload" ? "Uploading…" : "Browse"}
               </button>
             </div>
-            {error ? <p className="mt-2 text-xs text-red-600">{error}</p> : null}
           </div>
+
+          {error ? <p className="text-xs text-red-600">{error}</p> : null}
         </div>
       </div>
     </div>

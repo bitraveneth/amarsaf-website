@@ -1,5 +1,5 @@
 import { BadgeCheck, Factory, FlaskConical, ShieldCheck } from "lucide-react";
-import type { Metadata } from "next";
+import { metadataForEntry } from "@/lib/cms/seo";
 import Image from "next/image";
 import { AboutExplore } from "@/components/about-explore";
 import { AboutNav } from "@/components/about-nav";
@@ -8,11 +8,15 @@ import { images } from "@/lib/images";
 import { cleanroom, purification, standards } from "@/lib/quality";
 import { minerals } from "@/lib/site";
 
-export const metadata: Metadata = {
-  title: "Quality & Safety",
-  description:
-    "How SAF purifies water in eight stages, keeps essential minerals, and bottles in a Class 100,000 cleanroom under BSTI, ISO 22000, HACCP, and Halal.",
-};
+export async function generateMetadata() {
+  return metadataForEntry({
+    kind: "page",
+    slug: "about/quality",
+    fallbackTitle: "Quality & Safety",
+    fallbackDescription:
+      "How SAF purifies water in eight stages, keeps essential minerals, and bottles in a Class 100,000 cleanroom under BSTI, ISO 22000, HACCP, and Halal.",
+  });
+}
 
 export default function QualityPage() {
   return (

@@ -1,0 +1,42 @@
+-- AlterTable
+ALTER TABLE "SiteSettings" ADD COLUMN "seoKeywords" TEXT,
+ADD COLUMN "titleTemplate" TEXT DEFAULT '%s | SAF Water',
+ADD COLUMN "ogImageId" TEXT,
+ADD COLUMN "allowIndexing" BOOLEAN NOT NULL DEFAULT true;
+
+ALTER TABLE "Page" ADD COLUMN "seoKeywords" TEXT,
+ADD COLUMN "ogTitle" TEXT,
+ADD COLUMN "ogDescription" TEXT,
+ADD COLUMN "ogImageId" TEXT,
+ADD COLUMN "noIndex" BOOLEAN NOT NULL DEFAULT false;
+
+ALTER TABLE "Product" ADD COLUMN "seoTitle" TEXT,
+ADD COLUMN "seoDescription" TEXT,
+ADD COLUMN "seoKeywords" TEXT,
+ADD COLUMN "ogTitle" TEXT,
+ADD COLUMN "ogDescription" TEXT,
+ADD COLUMN "ogImageId" TEXT,
+ADD COLUMN "noIndex" BOOLEAN NOT NULL DEFAULT false;
+
+ALTER TABLE "NewsPost" ADD COLUMN "seoTitle" TEXT,
+ADD COLUMN "seoDescription" TEXT,
+ADD COLUMN "seoKeywords" TEXT,
+ADD COLUMN "ogTitle" TEXT,
+ADD COLUMN "ogDescription" TEXT,
+ADD COLUMN "ogImageId" TEXT,
+ADD COLUMN "noIndex" BOOLEAN NOT NULL DEFAULT false;
+
+ALTER TABLE "LegalDoc" ADD COLUMN "seoTitle" TEXT,
+ADD COLUMN "seoDescription" TEXT,
+ADD COLUMN "seoKeywords" TEXT,
+ADD COLUMN "ogTitle" TEXT,
+ADD COLUMN "ogDescription" TEXT,
+ADD COLUMN "ogImageId" TEXT,
+ADD COLUMN "noIndex" BOOLEAN NOT NULL DEFAULT false;
+
+-- AddForeignKey
+ALTER TABLE "SiteSettings" ADD CONSTRAINT "SiteSettings_ogImageId_fkey" FOREIGN KEY ("ogImageId") REFERENCES "Media"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "Page" ADD CONSTRAINT "Page_ogImageId_fkey" FOREIGN KEY ("ogImageId") REFERENCES "Media"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "Product" ADD CONSTRAINT "Product_ogImageId_fkey" FOREIGN KEY ("ogImageId") REFERENCES "Media"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "NewsPost" ADD CONSTRAINT "NewsPost_ogImageId_fkey" FOREIGN KEY ("ogImageId") REFERENCES "Media"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "LegalDoc" ADD CONSTRAINT "LegalDoc_ogImageId_fkey" FOREIGN KEY ("ogImageId") REFERENCES "Media"("id") ON DELETE SET NULL ON UPDATE CASCADE;

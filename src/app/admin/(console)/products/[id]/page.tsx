@@ -8,6 +8,7 @@ import { deleteProduct, upsertProduct } from "@/lib/admin-actions";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { MediaPicker } from "@/components/admin/media-picker";
 import { PublishCheckbox } from "@/components/admin/publish-checkbox";
+import { SeoFields } from "@/components/admin/seo-fields";
 import { FormMessage, FormSuccess } from "@/components/admin/form-message";
 
 export default async function AdminProductEditPage({
@@ -214,6 +215,13 @@ export default async function AdminProductEditPage({
                 </div>
               </div>
             </section>
+
+            <SeoFields
+              media={media}
+              fallbackTitle={product ? `${product.name} ${product.size}` : "Product"}
+              fallbackDescription={product?.description || product?.summary || "SAF packaged drinking water."}
+              values={product}
+            />
 
             <PublishCheckbox role={user.role} defaultChecked={product?.isPublished ?? true} />
           </div>

@@ -1,13 +1,14 @@
 "use client";
 
-import { Check } from "lucide-react";
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { Check, Loader2 } from "lucide-react";
+import { useEffect, useRef, useState, useTransition, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { jobs } from "@/lib/careers";
 import { businessNeeds, enquiryTypes, supportTopics, type EnquiryType } from "@/lib/contact";
+import { submitContactEnquiry } from "@/lib/contact-submit";
 import { company, products } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
@@ -66,17 +67,20 @@ export function ContactForm({
   const [type, setType] = useState<EnquiryType>(defaultType);
   const [errors, setErrors] = useState<Partial<Record<FieldName, string>>>({});
   const [submitted, setSubmitted] = useState<EnquiryType | null>(null);
+  const [sendError, setSendError] = useState<string | null>(null);
+  const [pending, startTransition] = useTransition();
   const alertRef = useRef<HTMLDivElement>(null);
   const errorCount = Object.keys(errors).length;
   const needs = required[type];
 
   useEffect(() => {
-    if (submitted || errorCount > 0) alertRef.current?.focus();
-  }, [submitted, errorCount]);
+    if (submitted || errorCount > 0 || sendError) alertRef.current?.focus();
+  }, [submitted, errorCount, sendError]);
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
+    const form = event.currentTarget;
+    const data = new FormData(form);
     const next: Partial<Record<FieldName, string>> = {};
     for (const name of needs) {
       if (!String(data.get(name) ?? "").trim()) next[name] = fieldCopy[name];
@@ -84,12 +88,29 @@ export function ContactForm({
     const email = String(data.get("email") ?? "").trim();
     if (email && !isEmail(email)) next.email = fieldCopy.email;
     setErrors(next);
-    setSubmitted(Object.keys(next).length === 0 ? type : null);
+    setSendError(null);
+    if (Object.keys(next).length > 0) {
+      setSubmitted(null);
+      return;
+    }
+
+    startTransition(async () => {
+      const result = await submitContactEnquiry(data);
+      if (!result.ok) {
+        setSendError(result.error);
+        setSubmitted(null);
+        return;
+      }
+      setSendError(null);
+      setSubmitted(type);
+      form.reset();
+    });
   }
 
   function chooseType(next: EnquiryType) {
     setType(next);
     setErrors({});
+    setSendError(null);
   }
 
   if (submitted) {
@@ -99,11 +120,10 @@ export function ContactForm({
         <span className="flex size-12 items-center justify-center rounded-full bg-purple text-white">
           <Check aria-hidden className="size-6" />
         </span>
-        <p className="eyebrow mt-6 text-purple">{label} recorded</p>
+        <p className="eyebrow mt-6 text-purple">{label} sent</p>
         <h3 className="text-title mt-3 text-ink">Thank you — we have your details.</h3>
         <p className="mt-4 max-w-prose leading-relaxed text-ink/80">
-          This preview keeps your enquiry in this browser session only; it is not
-          sent anywhere yet. For a quick answer, call the hotline on{" "}
+          Your enquiry is with the SAF team. We will follow up soon. For a quicker answer, call{" "}
           <span className="font-semibold whitespace-nowrap text-ink">{company.hotline}</span>.
         </p>
         <Button
@@ -155,6 +175,17 @@ export function ContactForm({
           className="rounded-xl border border-destructive/30 bg-[#fff5f7] px-4 py-3 text-sm font-medium text-destructive"
         >
           Please check the form. {errorCount} {errorCount === 1 ? "field needs" : "fields need"} a correction.
+        </div>
+      ) : null}
+
+      {sendError ? (
+        <div
+          ref={alertRef}
+          tabIndex={-1}
+          role="alert"
+          className="rounded-xl border border-destructive/30 bg-[#fff5f7] px-4 py-3 text-sm font-medium text-destructive"
+        >
+          {sendError}
         </div>
       ) : null}
 
@@ -238,8 +269,19 @@ export function ContactForm({
         ) : null}
       </div>
 
-      <Button type="submit" className="h-12 w-full rounded-full px-7 text-[0.9375rem] font-semibold sm:w-fit">
-        Send {enquiryTypes.find((item) => item.id === type)?.title.toLowerCase()}
+      <Button
+        type="submit"
+        disabled={pending}
+        className="h-12 w-full rounded-full px-7 text-[0.9375rem] font-semibold sm:w-fit"
+      >
+        {pending ? (
+          <>
+            <Loader2 className="size-4 animate-spin" />
+            Sending…
+          </>
+        ) : (
+          <>Send {enquiryTypes.find((item) => item.id === type)?.title.toLowerCase()}</>
+        )}
       </Button>
     </form>
   );

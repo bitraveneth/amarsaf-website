@@ -9,6 +9,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { PublishCheckbox } from "@/components/admin/publish-checkbox";
+import { SeoFields } from "@/components/admin/seo-fields";
 import type { Role } from "@/lib/roles";
 import { cn } from "@/lib/utils";
 
@@ -31,6 +32,20 @@ export type LegalDocDraft = {
   updatedIso: string | null;
   order: number;
   isPublished: boolean;
+  seoTitle?: string | null;
+  seoDescription?: string | null;
+  seoKeywords?: string | null;
+  ogTitle?: string | null;
+  ogDescription?: string | null;
+  ogImageId?: string | null;
+  noIndex?: boolean;
+};
+
+type MediaItem = {
+  id: string;
+  url: string;
+  alt: string;
+  filename: string | null;
 };
 
 function newSection(): LegalSectionDraft {
@@ -48,6 +63,7 @@ function DocEditor({
   canDelete,
   open,
   onToggle,
+  media,
   saveAction,
   deleteAction,
 }: {
@@ -56,6 +72,7 @@ function DocEditor({
   canDelete: boolean;
   open: boolean;
   onToggle: () => void;
+  media: MediaItem[];
   saveAction: (formData: FormData) => Promise<void>;
   deleteAction: (formData: FormData) => Promise<void>;
 }) {
@@ -224,6 +241,12 @@ function DocEditor({
                   <PublishCheckbox role={role} defaultChecked={doc.isPublished} />
                 </div>
               </div>
+              <SeoFields
+                media={media}
+                fallbackTitle={doc.title}
+                fallbackDescription={doc.description}
+                values={doc}
+              />
             </div>
 
             <div className="space-y-3">
@@ -439,9 +462,11 @@ Second point"
 
 function NewDocForm({
   role,
+  media,
   saveAction,
 }: {
   role: Role;
+  media: MediaItem[];
   saveAction: (formData: FormData) => Promise<void>;
 }) {
   const [open, setOpen] = useState(false);
@@ -509,6 +534,11 @@ function NewDocForm({
             <PublishCheckbox role={role} defaultChecked />
           </div>
         </div>
+        <SeoFields
+          media={media}
+          fallbackTitle="Legal document"
+          fallbackDescription="SAF legal information."
+        />
 
         <div className="space-y-3">
           <div className="flex items-center justify-between gap-3">
@@ -619,12 +649,14 @@ export function LegalDocsEditor({
   docs,
   role,
   canDelete,
+  media,
   saveAction,
   deleteAction,
 }: {
   docs: LegalDocDraft[];
   role: Role;
   canDelete: boolean;
+  media: MediaItem[];
   saveAction: (formData: FormData) => Promise<void>;
   deleteAction: (formData: FormData) => Promise<void>;
 }) {
@@ -640,11 +672,12 @@ export function LegalDocsEditor({
           canDelete={canDelete}
           open={openId === doc.id}
           onToggle={() => setOpenId((id) => (id === doc.id ? null : doc.id))}
+          media={media}
           saveAction={saveAction}
           deleteAction={deleteAction}
         />
       ))}
-      <NewDocForm role={role} saveAction={saveAction} />
+      <NewDocForm role={role} media={media} saveAction={saveAction} />
     </div>
   );
 }

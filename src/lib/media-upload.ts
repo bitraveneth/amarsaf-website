@@ -1,5 +1,5 @@
 import { put } from "@vercel/blob";
-import { mkdir, writeFile } from "fs/promises";
+import { mkdir, unlink, writeFile } from "fs/promises";
 import path from "path";
 import { randomUUID } from "crypto";
 
@@ -27,6 +27,18 @@ export async function uploadMediaFile(file: File): Promise<{
   const bytes = Buffer.from(await file.arrayBuffer());
   await writeFile(path.join(dir, filename), bytes);
   return { url: `/uploads/${filename}`, filename, mimeType, sizeBytes };
+}
+
+/** Best-effort cleanup for local /uploads files only. */
+export async function removeLocalUpload(url: string | null | undefined) {
+  if (!url || !url.startsWith("/uploads/")) return;
+  const filename = path.basename(url);
+  if (!filename || filename.includes("..")) return;
+  try {
+    await unlink(path.join(process.cwd(), "public", "uploads", filename));
+  } catch {
+    // Missing file or permission — ignore
+  }
 }
 
 function sanitize(name: string) {

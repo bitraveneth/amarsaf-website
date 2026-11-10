@@ -1,14 +1,18 @@
-import type { Metadata } from "next";
 import Image from "next/image";
 import { PageIntro } from "@/components/page-intro";
 import { getNewsPosts } from "@/lib/cms/news";
+import { metadataForEntry } from "@/lib/cms/seo";
 import { images } from "@/lib/images";
 
-export const metadata: Metadata = {
-  title: "News",
-  description:
-    "Notes from SAF: the brand launch, BSTI and ISO certification, and office jar delivery in Dhaka.",
-};
+export async function generateMetadata() {
+  return metadataForEntry({
+    kind: "page",
+    slug: "news",
+    fallbackTitle: "News",
+    fallbackDescription:
+      "Notes from SAF: the brand launch, BSTI and ISO certification, and office jar delivery in Dhaka.",
+  });
+}
 
 export default async function NewsPage() {
   const stories = await getNewsPosts();
